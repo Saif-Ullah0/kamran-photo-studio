@@ -14,6 +14,7 @@ export const SITE = {
     "We are offering unmatched rates of photography and videography with the best quality for our valued clients.",
   instagram: "https://instagram.com/kamranphotostudio", // TODO: replace with real handle
   youtube: "https://youtube.com/@kamranphotostudio", // TODO: replace with real handle
+  googleMapsListing: "", // TODO: paste the "share" link to your Google Business listing here — used to link the ratings badge in Testimonials
 };
 
 export function waLink(message: string) {
@@ -29,6 +30,7 @@ export const NAV_LINKS = [
   { label: "Packages", href: "/#packages" },
   { label: "About", href: "/#about" },
   { label: "Team", href: "/#team" },
+  { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/#contact" },
 ];
 
@@ -97,6 +99,17 @@ export const TEAM_MEMBERS: TeamMember[] = [
     specialties: ["Photography"], // TODO: add his real specialties
   },
   {
+    id: "kamram",
+    name: "Kamram",
+    role: "Videographer",
+    image: "/team/kamran.jpg",
+    shortBio: "Videographer at Kamran Photo Studio, capturing the movement and emotion behind every story.",
+    story: [
+      "Kamram is part of the videography team at Kamran Photo Studio, creating cinematic wedding films, event coverage, and brand stories.",
+    ],
+    specialties: ["Cinematic Films", "Wedding Videography", "Event Coverage"],
+  },
+  {
     id: "ramazan-ali",
     name: "Ramazan Ali",
     role: "Photographer",
@@ -108,6 +121,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     ],
     specialties: ["Photography"], // TODO: add his real specialties
   },
+  
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -223,6 +237,7 @@ export interface PricingTier {
   id: string;
   duration: string;
   price: string;
+  priceValue: number; // numeric PKR amount, used by the quote calculator
   cadence: string;
   description: string;
   features: string[];
@@ -242,6 +257,7 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
       id: "photo-1day",
       duration: "1 Day",
       price: "PKR 45,000",
+      priceValue: 45000,
       cadence: "per session",
       description: "Editorial-grade stills for portraits, events, and brand work.",
       features: [
@@ -255,6 +271,7 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
       id: "photo-2day",
       duration: "2 Days",
       price: "PKR 80,000",
+      priceValue: 80000,
       cadence: "per project",
       description: "Extended coverage across two days for larger events.",
       features: [
@@ -269,6 +286,7 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
       id: "photo-3day",
       duration: "3 Days",
       price: "PKR 110,000",
+      priceValue: 110000,
       cadence: "per project",
       description: "Complete multi-day documentation, start to finish.",
       features: [
@@ -284,6 +302,7 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
       id: "video-1day",
       duration: "1 Day",
       price: "PKR 120,000",
+      priceValue: 120000,
       cadence: "per project",
       description: "Full-day cinematography with a graded highlight film.",
       features: [
@@ -297,6 +316,7 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
       id: "video-2day",
       duration: "2 Days",
       price: "PKR 190,000",
+      priceValue: 190000,
       cadence: "per project",
       description: "Two-day cinema coverage with licensed aerial drone footage.",
       features: [
@@ -311,6 +331,7 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
       id: "video-3day",
       duration: "3 Days",
       price: "PKR 260,000",
+      priceValue: 260000,
       cadence: "per project",
       description: "The complete drone, cinema & studio master package.",
       features: [
@@ -362,3 +383,166 @@ export const MEDIA = {
   showreelFull: "/videos/intro-reel.mp4",
   shutterSound: "/sounds/shutter-click.mp3", // TODO: add a real shutter-click mp3 to public/sounds
 };
+
+// ─────────────────────────────────────────────────────────────────────────
+// QUOTE CALCULATOR — custom builder: days × crew/equipment counts, priced
+// per day, plus a couple of flat one-time add-ons. This is separate from
+// the fixed Packages above — that's the "browse our standard bundles"
+// experience, this is the "build something custom" one.
+// ─────────────────────────────────────────────────────────────────────────
+export interface ResourceRate {
+  id: string;
+  label: string;
+  pricePerDay: number; // PKR, per unit, per day
+  description: string;
+}
+
+export const RESOURCE_RATES: ResourceRate[] = [
+  {
+    id: "photographer",
+    label: "Photographer",
+    pricePerDay: 20000,
+    description: "Full-day stills coverage, one shooter",
+  },
+  {
+    id: "videographer",
+    label: "Videographer",
+    pricePerDay: 30000,
+    description: "Full-day 4K cinema coverage, one shooter",
+  },
+  {
+    id: "drone",
+    label: "Drone Operator",
+    pricePerDay: 15000,
+    description: "Licensed aerial coverage, one operator + drone",
+  },
+];
+
+export interface AddOn {
+  id: string;
+  label: string;
+  price: number; // flat one-time PKR amount, not per day
+}
+
+export const ADD_ONS: AddOn[] = [
+  { id: "rush-delivery", label: "Rush Delivery (48-hour turnaround)", price: 12000 },
+  { id: "premium-album", label: "Premium Printed Album", price: 18000 },
+];
+
+// ─────────────────────────────────────────────────────────────────────────
+// AVAILABILITY CALENDAR
+// Manually maintained — add a date here once a shoot is booked, remove it
+// once it's free again. This is NOT synced to any real booking system or
+// calendar app; it's a plain list someone edits by hand. ISO format
+// (YYYY-MM-DD). The calendar UI always shows the current month based on
+// the visitor's own device clock, so no date here needs "today" logic.
+// ─────────────────────────────────────────────────────────────────────────
+export const BOOKED_DATES: string[] = [
+  // TODO: replace these example dates with Kamran's real booked dates.
+  "2026-09-05",
+  "2026-09-12",
+  "2026-09-19",
+  "2026-09-20",
+  "2026-10-03",
+];
+
+// ─────────────────────────────────────────────────────────────────────────
+// TESTIMONIALS
+// Real reviews from the Kamran Photo Studio Google Business listing.
+// Skipped: reviews with no actual quote text, and the one negative review
+// (Mubashar Masood, "No Quality Work") — not because it's hidden, it's
+// reflected honestly in the 4.6 aggregate below, just not featured as a
+// pull-quote. Gull Khan's "editing" (source said "Auditing") is corrected
+// as an obvious typo; everything else is close to verbatim. Star ratings
+// aren't individually confirmable from the source text except where the
+// owner's own reply states it (Gull Khan: confirmed 5-star) — the rest
+// are shown at 5 since all featured quotes are unambiguously positive;
+// the honest number is the aggregate below.
+// ─────────────────────────────────────────────────────────────────────────
+export const GOOGLE_RATING = {
+  average: 4.6,
+  count: 7,
+};
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  context: string;
+  quote: string;
+  rating: number; // 1-5
+}
+
+export const TESTIMONIALS: Testimonial[] = [
+  {
+    id: "t1",
+    name: "Gull Khan",
+    context: "Google Review",
+    quote:
+      "They do a great job; their photography is very good, and their editing is also excellent. Nice work and good experience.",
+    rating: 5,
+  },
+  {
+    id: "t2",
+    name: "Kim Yuna",
+    context: "Regular Client · Google Review",
+    quote: "Their work is very good and the price is reasonable — their service is good too.",
+    rating: 5,
+  },
+  {
+    id: "t3",
+    name: "Mudassir Ali",
+    context: "Google Review",
+    quote: "Very good service, I like it.",
+    rating: 5,
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────
+// FAQ
+// Reasonable industry-standard defaults — the ones marked TODO have real
+// numbers/policies that need confirming with Kamran before launch.
+// ─────────────────────────────────────────────────────────────────────────
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export const FAQS: FAQItem[] = [
+  {
+    id: "f1",
+    question: "How far in advance should we book?",
+    answer:
+      "For weddings, we recommend booking 2–3 months ahead to guarantee your date, especially in peak season. Portrait and commercial sessions can usually be scheduled with 1–2 weeks' notice.", // TODO: confirm real lead times
+  },
+  {
+    id: "f2",
+    question: "What's included in the price?",
+    answer:
+      "Every package includes full coverage for the booked duration, professional editing and retouching, and a private online gallery for delivery. See the Packages section above for what's included at each tier.",
+  },
+  {
+    id: "f3",
+    question: "How long until we get our photos or film?",
+    answer:
+      "Typical turnaround is 2–3 weeks for photography and 3–4 weeks for cinema/film packages. Rush delivery is available as an add-on if you need your gallery sooner.", // TODO: confirm real turnaround
+  },
+  {
+    id: "f4",
+    question: "Do you require a deposit?",
+    answer:
+      "Yes — a deposit is required to confirm your booking, with the balance due on or before the shoot date. Message us on WhatsApp for the exact deposit amount for your package.", // TODO: confirm deposit policy
+  },
+  {
+    id: "f5",
+    question: "Do you travel outside Lahore?",
+    answer:
+      "Yes, we shoot destination weddings and out-of-city events. Travel and accommodation costs are quoted separately depending on location.",
+  },
+  {
+    id: "f6",
+    question: "Can we customize a package?",
+    answer:
+      "Absolutely. Use the instant quote tool above to add extras like a second shooter, drone coverage, or a premium album — or just message us directly and we'll build something that fits.",
+  },
+];

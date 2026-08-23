@@ -1,0 +1,1 @@
+Drop a real shutter-click.mp3 here (short, <1s, mechanical camera shutter sound). The Hero3D component references /sounds/shutter-click.mp3 — the flash effect still works even without this file, but the click sound will silently fail until it's added.
