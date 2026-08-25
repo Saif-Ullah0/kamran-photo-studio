@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { PortfolioItem } from "@/lib/data";
+import { ASPECT_DIMENSIONS } from "@/lib/utils";
 
 interface LightboxProps {
   items: PortfolioItem[];
@@ -90,10 +92,12 @@ export default function Lightbox({ items, index, onClose, onNavigate }: Lightbox
             onClick={(e) => e.stopPropagation()}
             className="max-h-[85vh] max-w-4xl"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={current.image}
               alt={current.title}
+              width={ASPECT_DIMENSIONS[current.aspect].width}
+              height={ASPECT_DIMENSIONS[current.aspect].height}
+              sizes="(max-width: 1024px) 90vw, 900px"
               className="max-h-[75vh] w-auto rounded-lg border border-line object-contain"
             />
             <figcaption className="mt-4 flex flex-col items-center gap-1 text-center">

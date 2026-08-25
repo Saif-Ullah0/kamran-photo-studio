@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { PORTFOLIO_ITEMS, PORTFOLIO_FILTERS, type PortfolioCategory } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { cn, ASPECT_DIMENSIONS } from "@/lib/utils";
 import Lightbox from "./Lightbox";
 
 export default function PortfolioGrid() {
@@ -74,12 +75,14 @@ export default function PortfolioGrid() {
                 onClick={() => setLightboxIndex(PORTFOLIO_ITEMS.indexOf(item))}
                 className="group relative mb-4 block w-full overflow-hidden rounded-xl border border-line bg-charcoal text-left"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={item.image}
                   alt={item.title}
+                  width={ASPECT_DIMENSIONS[item.aspect].width}
+                  height={ASPECT_DIMENSIONS[item.aspect].height}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   loading="lazy"
-                  className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="h-auto w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-obsidian/95 via-obsidian/60 to-transparent p-4 transition-transform duration-500 ease-out group-hover:translate-y-0">
                   <p className="text-sm font-medium text-offwhite">{item.title}</p>
