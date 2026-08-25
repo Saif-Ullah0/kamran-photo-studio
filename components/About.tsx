@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { ABOUT_IMAGE, STATS } from "@/lib/data";
 import AnimatedCounter from "./AnimatedCounter";
@@ -18,11 +19,12 @@ export default function About() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-line"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={ABOUT_IMAGE}
             alt="Kamran with cinema gear on location"
-            className="h-full w-full object-cover"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-obsidian/40 to-transparent" />
         </motion.div>
