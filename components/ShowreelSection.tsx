@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { Play } from "lucide-react";
 import VideoModal from "./VideoModal";
@@ -21,11 +22,12 @@ export default function ShowreelSection() {
       {/* Fallback photo, always present underneath — if the video is
           missing/broken (wrong path, unsupported format, still loading)
           this shows instead of a flat black box. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={MEDIA.showreelFallbackImage}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover"
+        fill
+        sizes="100vw"
+        className="object-cover"
       />
 
       {!videoFailed && (
