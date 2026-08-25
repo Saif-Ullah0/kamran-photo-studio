@@ -26,11 +26,10 @@ export function waLink(message: string) {
 // ─────────────────────────────────────────────────────────────────────────
 export const NAV_LINKS = [
   { label: "Portfolio", href: "/#portfolio" },
-  { label: "Showreel", href: "/#showreel" },
   { label: "Packages", href: "/#packages" },
   { label: "About", href: "/#about" },
   { label: "Team", href: "/#team" },
-  { label: "FAQ", href: "/#faq" },
+  { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/#contact" },
 ];
 
@@ -71,6 +70,65 @@ export interface TeamMember {
   story: string[];
   specialties: string[];
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// GEAR — the studio's real equipment. "Sony A7v" from the original list
+// was assumed to mean the Sony A7R V (a real, distinct high-resolution
+// body) rather than a repeat of the A7 IV — flag if that's wrong.
+//
+// `image` is only set for the two models with a verified, correctly-
+// labeled stock photo (confirmed via the photographer's own caption or
+// the photo's embedded EXIF camera-model data) — showing a wrong camera
+// under a model name would be worse than showing none. The other four
+// intentionally have no `image` and get a non-photo card treatment
+// instead. Swap in real photos of your own gear any time — see the
+// `image` field below.
+// ─────────────────────────────────────────────────────────────────────────
+export interface GearItem {
+  name: string;
+  role: string;
+  category: string;
+  image?: string;
+}
+
+export const GEAR: GearItem[] = [
+  {
+    name: "Sony A7 IV",
+    role: "Primary photography body",
+    category: "Full-Frame Mirrorless",
+    image: "https://images.unsplash.com/photo-1692030179143-e30fe7102900?q=70&w=700&auto=format&fit=crop",
+  },
+  {
+    name: "Sony A7 III",
+    role: "Secondary / second-shooter body",
+    category: "Full-Frame Mirrorless",
+    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=70&w=700&auto=format&fit=crop",
+  },
+  {
+    name: "Nikon D750",
+    role: "DSLR body",
+    category: "DSLR",
+    image: "https://images.unsplash.com/photo-1507305381075-5add10cdb4e7?q=70&w=700&auto=format&fit=crop",
+  },
+  {
+    name: "Sony A6500",
+    role: "APS-C body",
+    category: "APS-C Mirrorless",
+    image: "https://images.unsplash.com/photo-1564466809058-bf4114d55352?q=70&w=700&auto=format&fit=crop",
+  },
+  {
+    name: "Sony A6400",
+    role: "APS-C body",
+    category: "APS-C Mirrorless",
+    image: "https://images.unsplash.com/photo-1512790182412-b19e6d62bc39?q=70&w=700&auto=format&fit=crop",
+  },
+  {
+    name: "Sony A7R V",
+    role: "High-resolution body",
+    category: "Full-Frame Mirrorless",
+    image: "https://images.unsplash.com/photo-1510127034890-ba27508e9f1c?q=70&w=700&auto=format&fit=crop",
+  },
+];
 
 export const TEAM_MEMBERS: TeamMember[] = [
   {
@@ -121,7 +179,6 @@ export const TEAM_MEMBERS: TeamMember[] = [
     ],
     specialties: ["Photography"], // TODO: add his real specialties
   },
-  
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -382,6 +439,9 @@ export const MEDIA = {
   // into two different paths if you want a shorter teaser vs. full reel.
   showreelFull: "/videos/intro-reel.mp4",
   shutterSound: "/sounds/shutter-click.mp3", // TODO: add a real shutter-click mp3 to public/sounds
+  // "The Kit" section — real 6s exploded-view camera video, played back
+  // slowed down. Drop the file at public/videos/camera-explode.mp4.
+  cameraExplodeVideo: "/videos/camera-explode.mp4",
 };
 
 // ─────────────────────────────────────────────────────────────────────────

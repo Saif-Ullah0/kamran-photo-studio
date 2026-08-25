@@ -41,7 +41,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
-      <body className="antialiased bg-obsidian text-offwhite font-body">
+      <body
+        className="antialiased bg-obsidian text-offwhite font-body"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>
