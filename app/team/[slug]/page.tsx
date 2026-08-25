@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ContactFooter from "@/components/ContactFooter";
+import BackButton from "@/components/BackButton";
 import { TEAM_MEMBERS, waLink } from "@/lib/data";
 
 interface PageProps {
@@ -38,13 +39,9 @@ export default async function TeamMemberPage({ params }: PageProps) {
 
       <section className="px-5 pb-16 pt-32 sm:px-8 sm:pt-40">
         <div className="mx-auto max-w-5xl">
-          <Link
-            href="/#team"
-            className="mb-10 inline-flex items-center gap-2 text-sm text-slate transition-colors hover:text-gold"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to the team
-          </Link>
+          <div className="mb-10">
+            <BackButton fallbackHref="/#team" label="Back to the team" />
+          </div>
 
           <div className="grid items-start gap-10 md:grid-cols-[320px_1fr] md:gap-14">
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-line">

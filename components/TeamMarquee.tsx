@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { TEAM_MEMBERS } from "@/lib/data";
+import AmbientGlow from "./AmbientGlow";
 
 export default function TeamMarquee() {
   const ref = useRef(null);
@@ -19,7 +20,8 @@ export default function TeamMarquee() {
       ref={ref}
       className="relative overflow-hidden bg-obsidian py-24 sm:py-32"
     >
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+      <AmbientGlow className="right-0 top-1/3 translate-x-1/3" />
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
