@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { Instagram, Youtube, MessageCircle, Send } from "lucide-react";
 import { SITE, waLink } from "@/lib/data";
@@ -163,11 +164,36 @@ export default function ContactFooter() {
       </div>
 
       <div className="mt-16 border-t border-line py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 px-5 text-center sm:px-8">
-          <p className="font-display text-lg text-offwhite">Kamran Photo Studio</p>
-          <p className="text-xs text-slate">
-            © 2026 Kamran Photo Studio. All rights reserved.
-          </p>
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-5 text-center sm:px-8">
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate">
+            <Link href="/#portfolio" className="transition-colors hover:text-gold">
+              Portfolio
+            </Link>
+            <Link href="/#packages" className="transition-colors hover:text-gold">
+              Packages
+            </Link>
+            <Link href="/quote" className="transition-colors hover:text-gold">
+              Get a Quote
+            </Link>
+            <Link href="/availability" className="transition-colors hover:text-gold">
+              Availability
+            </Link>
+            <Link href="/#about" className="transition-colors hover:text-gold">
+              About
+            </Link>
+            <Link href="/#team" className="transition-colors hover:text-gold">
+              Team
+            </Link>
+            <Link href="/faq" className="transition-colors hover:text-gold">
+              FAQ
+            </Link>
+          </nav>
+          <div className="flex flex-col items-center gap-2">
+            <p className="font-display text-lg text-offwhite">Kamran Photo Studio</p>
+            <p className="text-xs text-slate">
+              © 2026 Kamran Photo Studio. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
     </section>
