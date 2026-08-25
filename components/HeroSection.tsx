@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { waLink, SITE, HERO_IMAGES_LEFT, HERO_IMAGES_RIGHT } from "@/lib/data";
@@ -21,11 +22,13 @@ export default function HeroSection() {
       {/* Mobile-only dimmed backdrop — the marquee columns are hidden below
           md, so this keeps the section from ever reading as flat black. */}
       <div className="absolute inset-0 md:hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={HERO_IMAGES_LEFT[0]}
           alt=""
-          className="h-full w-full object-cover opacity-25"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-25"
         />
         <div className="absolute inset-0 bg-obsidian/70" />
       </div>
