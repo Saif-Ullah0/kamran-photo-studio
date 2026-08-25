@@ -10,6 +10,7 @@ import {
   type PackageCategoryId,
 } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import AmbientGlow from "./AmbientGlow";
 
 export default function Pricing() {
   const ref = useRef(null);
@@ -20,8 +21,9 @@ export default function Pricing() {
     PACKAGE_CATEGORIES.find((c) => c.id === category)?.label ?? "";
 
   return (
-    <section id="packages" ref={ref} className="relative bg-obsidian py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+    <section id="packages" ref={ref} className="relative overflow-hidden bg-obsidian py-24 sm:py-32">
+      <AmbientGlow className="right-0 top-1/4 translate-x-1/3" />
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
