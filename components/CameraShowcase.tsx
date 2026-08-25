@@ -9,7 +9,7 @@ import { GEAR, MEDIA } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 // Tune these to taste:
-const PLAYBACK_RATE = 0.4; // 1 = normal speed, lower = slower. 0.4 stretches a 6s clip to ~15s.
+const PLAYBACK_RATE = 0.6; // 1 = normal speed, lower = slower. 0.4 stretches a 6s clip to ~15s.
 const START_DELAY_MS = 1500; // pause after the section enters view, before playback starts
 
 export default function CameraShowcase() {
