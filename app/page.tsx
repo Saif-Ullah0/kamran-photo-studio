@@ -28,10 +28,11 @@ export default function Home() {
       <QuickLinks />
       <SectionDivider />
       <About />
-      <SectionDivider />
-      <CameraShowcase />
+      
       <SectionDivider />
       <TeamMarquee />
+      <SectionDivider />
+      <CameraShowcase />
       <SectionDivider />
       <Testimonials />
       <ContactFooter />
