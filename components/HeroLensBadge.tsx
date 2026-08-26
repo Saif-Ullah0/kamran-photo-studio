@@ -27,8 +27,8 @@ export default function HeroLensBadge() {
         <Suspense fallback={null}>
           <Canvas
             camera={{ position: [0, 0, 4.8], fov: 40 }}
-            dpr={[1, 1.75]}
-            gl={{ antialias: true, alpha: true }}
+            dpr={[1, 1.5]}
+            gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
           >
             <ambientLight intensity={0.65} />
             <directionalLight position={[3, 4, 5]} intensity={1.6} color="#f4f4f5" />
