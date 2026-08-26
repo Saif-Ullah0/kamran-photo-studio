@@ -1,57 +1,117 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
-import { Check, Minus, Plus, MessageCircle } from "lucide-react";
+import React, { useMemo, useRef, useState } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { Check, Minus, Plus, MessageCircle, HelpCircle, ArrowRight, Camera, Video, Film, Aperture } from "lucide-react";
 import { RESOURCE_RATES, ADD_ONS, waLink } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
+// --- Helpers ---
 function formatPKR(amount: number) {
   return `PKR ${amount.toLocaleString("en-PK")}`;
 }
 
+// Map icons to crew types for studio context
+const CREW_ICONS: Record<string, React.ReactNode> = {
+  photographer: <Camera className="h-4 w-4 text-amber-400" />,
+  videographer: <Video className="h-4 w-4 text-amber-400" />,
+  drone: <Film className="h-4 w-4 text-amber-400" />,
+};
+
+// --- Animated Price Number ---
+function AnimatedNumber({ value }: { value: number }) {
+  return (
+    <motion.span
+      key={value}
+      initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="inline-block"
+    >
+      {formatPKR(value)}
+    </motion.span>
+  );
+}
+
+// --- Stepper Sub-Component ---
 interface StepperProps {
+  id?: string;
   label: string;
   description?: string;
   value: number;
   onChange: (next: number) => void;
   min?: number;
   max?: number;
+  unitPrice?: number;
 }
 
-function Stepper({ label, description, value, onChange, min = 0, max = 10 }: StepperProps) {
+function Stepper({
+  id,
+  label,
+  description,
+  value,
+  onChange,
+  min = 0,
+  max = 10,
+  unitPrice,
+}: StepperProps) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-line px-4 py-3">
-      <div>
-        <p className="text-sm font-medium text-offwhite">{label}</p>
-        {description && <p className="text-xs text-slate">{description}</p>}
+    <div className="group relative flex flex-col justify-between gap-3 rounded-2xl border border-white/10 bg-black/40 p-4 transition-all duration-300 hover:border-amber-400/40 hover:bg-white/[0.03] hover:shadow-[0_0_20px_rgba(251,191,36,0.05)] sm:flex-row sm:items-center">
+      <div className="flex items-start gap-3">
+        {id && CREW_ICONS[id] && (
+          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-400/20 bg-amber-400/10">
+            {CREW_ICONS[id]}
+          </div>
+        )}
+        <div>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold tracking-wide text-white">{label}</p>
+            {unitPrice !== undefined && unitPrice > 0 && (
+              <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-0.5 text-[11px] font-medium text-amber-300">
+                {formatPKR(unitPrice)}/day
+              </span>
+            )}
+          </div>
+          {description && <p className="mt-0.5 text-xs text-slate-400">{description}</p>}
+        </div>
       </div>
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => onChange(Math.max(min, value - 1))}
-          disabled={value <= min}
-          aria-label={`Decrease ${label}`}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-line text-slate transition-colors hover:border-gold hover:text-gold disabled:opacity-30 disabled:hover:border-line disabled:hover:text-slate"
-        >
-          <Minus className="h-3.5 w-3.5" />
-        </button>
-        <span className="w-5 text-center text-sm font-medium text-offwhite">{value}</span>
-        <button
-          onClick={() => onChange(Math.min(max, value + 1))}
-          disabled={value >= max}
-          aria-label={`Increase ${label}`}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-line text-slate transition-colors hover:border-gold hover:text-gold disabled:opacity-30 disabled:hover:border-line disabled:hover:text-slate"
-        >
-          <Plus className="h-3.5 w-3.5" />
-        </button>
+
+      <div className="flex items-center justify-between gap-4 sm:justify-end">
+        <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/60 p-1">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => onChange(Math.max(min, value - 1))}
+            disabled={value <= min}
+            aria-label={`Decrease ${label}`}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/5 text-slate-300 transition-colors hover:bg-amber-400/20 hover:text-amber-300 disabled:pointer-events-none disabled:opacity-25"
+          >
+            <Minus className="h-3.5 w-3.5" />
+          </motion.button>
+
+          <span className="w-8 text-center text-sm font-bold font-mono text-white">
+            {value}
+          </span>
+
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => onChange(Math.min(max, value + 1))}
+            disabled={value >= max}
+            aria-label={`Increase ${label}`}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/5 text-slate-300 transition-colors hover:bg-amber-400/20 hover:text-amber-300 disabled:pointer-events-none disabled:opacity-25"
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </motion.button>
+        </div>
       </div>
     </div>
   );
 }
 
+// --- Main Calculator Component ---
 export default function QuoteCalculator() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
+  const containerRef = useRef(null);
+  const inView = useInView(containerRef, { once: true, margin: "-80px" });
 
   const [days, setDays] = useState(1);
   const [counts, setCounts] = useState<Record<string, number>>({
@@ -74,68 +134,90 @@ export default function QuoteCalculator() {
     });
   }
 
-  const crewTotal = RESOURCE_RATES.reduce(
-    (sum, r) => sum + (counts[r.id] ?? 0) * r.pricePerDay,
-    0
-  );
-  const dayTotal = days * crewTotal;
-  const addOnTotal = ADD_ONS.filter((a) => selectedAddOns.has(a.id)).reduce(
-    (sum, a) => sum + a.price,
-    0
-  );
-  const total = dayTotal + addOnTotal;
-  const hasCrew = RESOURCE_RATES.some((r) => (counts[r.id] ?? 0) > 0);
+  // --- Calculations ---
+  const crewTotalPerDay = useMemo(() => {
+    return RESOURCE_RATES.reduce((sum, r) => sum + (counts[r.id] ?? 0) * r.pricePerDay, 0);
+  }, [counts]);
 
+  const totalCrewCost = days * crewTotalPerDay;
+
+  const totalAddOnCost = useMemo(() => {
+    return ADD_ONS.filter((a) => selectedAddOns.has(a.id)).reduce((sum, a) => sum + a.price, 0);
+  }, [selectedAddOns]);
+
+  const total = totalCrewCost + totalAddOnCost;
+  const hasCrew = useMemo(() => RESOURCE_RATES.some((r) => (counts[r.id] ?? 0) > 0), [counts]);
+
+  // --- Dynamic WhatsApp Payload ---
   const message = useMemo(() => {
     const crewLines = RESOURCE_RATES.filter((r) => (counts[r.id] ?? 0) > 0)
-      .map((r) => `- ${counts[r.id]} × ${r.label} (${formatPKR(r.pricePerDay)}/day)`)
+      .map((r) => `• ${counts[r.id]}x ${r.label} (${formatPKR(r.pricePerDay)}/day)`)
       .join("\n");
+
     const addOnLines = ADD_ONS.filter((a) => selectedAddOns.has(a.id))
-      .map((a) => `- ${a.label}`)
+      .map((a) => `• ${a.label} (${formatPKR(a.price)})`)
       .join("\n");
+
     return [
-      `Hi Kamran, I'd like a custom quote for:`,
-      `${days} day${days > 1 ? "s" : ""}`,
-      crewLines,
-      addOnLines ? `Add-ons:\n${addOnLines}` : "",
-      `Estimated total: ${formatPKR(total)}`,
+      `📸 *Photo Studio Quote Inquiry*`,
+      `⏱️ Duration: ${days} Day${days > 1 ? "s" : ""}`,
+      `🎥 Crew & Gear:\n${crewLines || "None selected"}`,
+      addOnLines ? `✨ Add-ons:\n${addOnLines}` : "",
+      `💰 Total Estimated Quote: ${formatPKR(total)}`,
+      `Hi! I configured this custom shoot package. Can we discuss date availability?`,
     ]
       .filter(Boolean)
       .join("\n\n");
   }, [days, counts, selectedAddOns, total]);
 
   return (
-    <section ref={ref} className="relative bg-obsidian py-24 sm:py-32">
-      <div className="mx-auto max-w-4xl px-5 sm:px-8">
+    <section ref={containerRef} className="relative overflow-hidden bg-[#070709] py-24 sm:py-32">
+      {/* Dynamic Background Illuminating Glow Effects */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.15, 0.25, 0.15],
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute left-1/2 top-1/4 -z-10 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-amber-500/30 via-orange-500/20 to-purple-600/10 blur-[130px]"
+      />
+      <div className="pointer-events-none absolute -left-20 bottom-10 -z-10 h-[400px] w-[400px] rounded-full bg-amber-600/10 blur-[100px]" />
+      <div className="pointer-events-none absolute -right-20 top-10 -z-10 h-[400px] w-[400px] rounded-full bg-orange-500/10 blur-[100px]" />
+
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-12 text-center"
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-14 text-center"
         >
-          <p className="mb-3 text-xs uppercase tracking-[0.3em] text-gold">
-            Build a Custom Quote
-          </p>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl text-offwhite">
-            Not a standard package? Build your own
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-widest text-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.15)]">
+            <Aperture className="h-3.5 w-3.5 animate-spin-slow" /> Studio Pricing Estimator
+          </span>
+          <h2 className="mt-4 font-serif text-3xl font-light tracking-tight text-white sm:text-5xl">
+            Estimate Your Shoot
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm text-slate">
-            Pick your days, crew, and equipment — see the price update live.
+          <p className="mx-auto mt-3 max-w-lg text-sm text-slate-400 sm:text-base">
+            Select crew size, multi-day coverage, and post-production upgrades to generate an instant shoot estimate.
           </p>
         </motion.div>
 
+        {/* Main Glass Calculator Card */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="rounded-2xl border border-line bg-charcoal p-6 sm:p-10"
+          className="relative rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] sm:p-10"
         >
-          {/* Days */}
-          <div className="mb-6">
-            <p className="mb-3 text-xs uppercase tracking-widest text-slate">Duration</p>
+          {/* Section 1: Shoot Duration */}
+          <div className="mb-8">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-amber-400/80">
+              01. Shoot Duration
+            </h3>
             <Stepper
-              label="Days"
-              description="Number of shoot days"
+              label="Total Shoot Days"
+              description="Number of continuous production days required"
               value={days}
               onChange={setDays}
               min={1}
@@ -143,17 +225,19 @@ export default function QuoteCalculator() {
             />
           </div>
 
-          {/* Crew & equipment */}
-          <div className="mb-6">
-            <p className="mb-3 text-xs uppercase tracking-widest text-slate">
-              Crew &amp; Equipment (per day)
-            </p>
-            <div className="space-y-2">
+          {/* Section 2: Crew & Hardware */}
+          <div className="mb-8">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-amber-400/80">
+              02. Studio Crew & Gear (Per Day)
+            </h3>
+            <div className="space-y-3">
               {RESOURCE_RATES.map((resource) => (
                 <Stepper
                   key={resource.id}
+                  id={resource.id}
                   label={resource.label}
-                  description={`${resource.description} — ${formatPKR(resource.pricePerDay)}/day`}
+                  description={resource.description}
+                  unitPrice={resource.pricePerDay}
                   value={counts[resource.id] ?? 0}
                   onChange={(v) => setCount(resource.id, v)}
                 />
@@ -161,126 +245,143 @@ export default function QuoteCalculator() {
             </div>
           </div>
 
-          {/* Add-ons */}
-          <div className="mb-8">
-            <p className="mb-3 text-xs uppercase tracking-widest text-slate">
-              Add-ons (one-time)
-            </p>
-            <div className="grid gap-2 sm:grid-cols-2">
+          {/* Section 3: Add-ons */}
+          <div className="mb-10">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-amber-400/80">
+              03. Post-Production & Upgrades
+            </h3>
+            <div className="grid gap-3 sm:grid-cols-2">
               {ADD_ONS.map((addOn) => {
                 const active = selectedAddOns.has(addOn.id);
                 return (
-                  <button
+                  <motion.button
                     key={addOn.id}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => toggleAddOn(addOn.id)}
                     className={cn(
-                      "flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors",
-                      active ? "border-gold bg-gold/10" : "border-line hover:border-gold/40"
+                      "flex items-center justify-between gap-3 rounded-2xl border p-4 text-left transition-all duration-300",
+                      active
+                        ? "border-amber-400 bg-amber-400/10 shadow-[0_0_25px_rgba(251,191,36,0.15)]"
+                        : "border-white/10 bg-black/40 hover:border-white/20 hover:bg-white/[0.03]"
                     )}
                   >
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-3">
                       <span
                         className={cn(
-                          "flex h-4 w-4 shrink-0 items-center justify-center rounded border",
-                          active ? "border-gold bg-gold" : "border-line"
+                          "flex h-5 w-5 shrink-0 items-center justify-center rounded-lg border transition-colors",
+                          active
+                            ? "border-amber-400 bg-amber-400 text-black"
+                            : "border-white/20 bg-black/60"
                         )}
                       >
-                        {active && <Check className="h-3 w-3 text-obsidian" strokeWidth={3} />}
+                        {active && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                       </span>
-                      <span className="text-sm text-offwhite">{addOn.label}</span>
+                      <span className="text-sm font-medium text-white">{addOn.label}</span>
                     </span>
-                    <span className="shrink-0 text-xs text-slate">
+                    <span className="shrink-0 font-mono text-xs font-semibold text-slate-300">
                       +{formatPKR(addOn.price)}
                     </span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
           </div>
 
-          {/* Breakdown */}
-          {hasCrew && (
-            <div className="mb-6 space-y-1.5 border-t border-line pt-6 text-sm text-slate">
-              {RESOURCE_RATES.filter((r) => (counts[r.id] ?? 0) > 0).map((r) => (
-                <div key={r.id} className="flex justify-between">
-                  <span>
-                    {counts[r.id]} × {r.label} × {days} day{days > 1 ? "s" : ""}
-                  </span>
-                  <span>{formatPKR(counts[r.id] * r.pricePerDay * days)}</span>
+          {/* Itemized Calculation Summary */}
+          <AnimatePresence>
+            {hasCrew && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden border-t border-white/10 pt-6"
+              >
+                <div className="space-y-2 font-mono text-xs text-slate-400">
+                  {RESOURCE_RATES.filter((r) => (counts[r.id] ?? 0) > 0).map((r) => (
+                    <div key={r.id} className="flex items-center justify-between">
+                      <span>
+                        {counts[r.id]}x {r.label} ({days} day{days > 1 ? "s" : ""})
+                      </span>
+                      <span className="text-slate-200">
+                        {formatPKR(counts[r.id] * r.pricePerDay * days)}
+                      </span>
+                    </div>
+                  ))}
+                  {ADD_ONS.filter((a) => selectedAddOns.has(a.id)).map((a) => (
+                    <div key={a.id} className="flex items-center justify-between text-amber-300/90">
+                      <span>Upgrade: {a.label}</span>
+                      <span>{formatPKR(a.price)}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              {ADD_ONS.filter((a) => selectedAddOns.has(a.id)).map((a) => (
-                <div key={a.id} className="flex justify-between">
-                  <span>{a.label}</span>
-                  <span>{formatPKR(a.price)}</span>
-                </div>
-              ))}
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* Total + CTA */}
+          {/* Grand Total & CTA */}
           <div
             className={cn(
-              "flex flex-col items-center gap-4 pt-6 sm:flex-row sm:justify-between",
-              !hasCrew && "border-t border-line"
+              "mt-6 flex flex-col gap-6 pt-6 sm:flex-row sm:items-center sm:justify-between",
+              hasCrew ? "border-t border-white/10" : ""
             )}
           >
             <div>
-              <p className="text-xs uppercase tracking-widest text-slate">Estimated total</p>
-              <p className="font-display text-3xl text-offwhite">{formatPKR(total)}</p>
+              <p className="text-xs uppercase tracking-widest text-slate-400">Estimated Total</p>
+              <div className="flex items-baseline gap-2 font-serif text-3xl font-medium text-white sm:text-4xl">
+                <AnimatedNumber value={total} />
+              </div>
               {hasCrew && days > 1 && (
-                <p className="mt-0.5 text-xs text-slate">
-                  ≈ {formatPKR(Math.round(total / days))} per day
+                <p className="mt-1 text-xs text-slate-400 font-mono">
+                  Avg. {formatPKR(Math.round(total / days))} per day
                 </p>
               )}
             </div>
+
             {hasCrew ? (
-              <a
+              <motion.a
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 href={waLink(message)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-medium text-obsidian transition-transform hover:scale-105 sm:w-auto"
+                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-8 py-4 text-sm font-bold text-black shadow-[0_0_30px_rgba(251,191,36,0.3)] transition-all hover:shadow-[0_0_40px_rgba(251,191,36,0.5)]"
               >
-                <MessageCircle className="h-4 w-4" strokeWidth={2.5} />
-                Send this quote on WhatsApp
-              </a>
+                <MessageCircle className="h-4 w-4 fill-black" />
+                Reserve Quote on WhatsApp
+              </motion.a>
             ) : (
-              <p className="text-xs text-slate/70">
-                Add at least one photographer, videographer, or drone above.
-              </p>
+              <div className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
+                <HelpCircle className="h-4 w-4 shrink-0" />
+                Select at least one photographer or crew member above to calculate quote.
+              </div>
             )}
           </div>
 
-          <p className="mt-4 text-center text-xs text-slate/70 sm:text-left">
-            This is a starting point, not a final number — most quotes flex once we talk
-            through what you actually need.
-          </p>
-
-          {hasCrew && (
-            <div className="mt-6 flex flex-col items-center gap-3 border-t border-line pt-6 text-center sm:flex-row sm:justify-between sm:text-left">
-              <p className="text-xs text-slate">
-                A bit more than you expected?{" "}
-                <a
-                  href={waLink(
-                    `Hi Kamran, I built a custom quote (${formatPKR(
-                      total
-                    )}) but it's a bit more than I was expecting. Can we talk about options that might fit my budget better?`
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gold underline underline-offset-2 hover:text-gold-soft"
-                >
-                  Let&apos;s talk about your budget
-                </a>
-              </p>
+          {/* Footer Action Links */}
+          <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-slate-400 sm:flex-row">
+            <p className="text-center sm:text-left">
+              Need custom terms or budget adjustments?{" "}
               <a
-                href="#packages"
-                className="text-xs text-slate underline underline-offset-2 hover:text-offwhite"
+                href={waLink(
+                  `Hi! I created a quote estimate of ${formatPKR(
+                    total
+                  )}, but I would like to discuss bespoke pricing for my target budget.`
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 underline underline-offset-4 hover:text-amber-300"
               >
-                Or see our fixed packages →
+                Discuss tailored budgets
               </a>
-            </div>
-          )}
+            </p>
+            <a
+              href="#packages"
+              className="inline-flex items-center gap-1 text-slate-300 transition-colors hover:text-white"
+            >
+              Explore fixed studio packages <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
         </motion.div>
       </div>
     </section>
