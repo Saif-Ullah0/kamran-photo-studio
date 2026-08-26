@@ -9,7 +9,8 @@ export const SITE = {
   email: "kamran.mubarikali@gmail.com",
   phoneDisplay: "+92 308 4427401",
   address: ADDRESS,
-  mapsEmbedSrc: `https://www.google.com/maps?q=${encodeURIComponent(ADDRESS)}&output=embed`,
+  mapsUrl: "https://www.google.com/maps/place/kamran+Photo+Studio/@31.383237,74.3614607,17z/data=!3m1!4b1!4m6!3m5!1s0x3919a93a695f02a7:0xaf5065810f6c0066!8m2!3d31.383237!4d74.3640356!16s%2Fg%2F11t977t8r7",
+  mapsEmbedSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3405.808064972161!2d74.3614607!3d31.383237!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3919a93a695f02a7%3A0xaf5065810f6c0066!2skamran%20Photo%20Studio!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s",
   tagline:
     "We are offering unmatched rates of photography and videography with the best quality for our valued clients.",
   instagram: "https://instagram.com/kamranphotostudio", // TODO: replace with real handle
@@ -210,7 +211,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     title: "Editorial Study No. 3",
     category: "Portraits",
     image:
-      "https://images.unsplash.com/photo-1503104834685-7205e8607eb9?q=72&w=900&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1722952934708-749c22eb2e58?q=70&w=560&auto=format&fit=crop",
     exif: "Sony A7S III | 85mm | f/1.8",
     aspect: "portrait",
   },
