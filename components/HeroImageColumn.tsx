@@ -39,6 +39,7 @@ export default function HeroImageColumn({
               alt=""
               fill
               sizes="(max-width: 1024px) 22vw, 18vw"
+              priority={i < 3}
               className="object-cover"
             />
           </div>
