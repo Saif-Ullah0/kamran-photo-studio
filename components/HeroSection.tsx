@@ -34,7 +34,7 @@ export default function HeroSection() {
           alt=""
           fill
           priority
-          sizes="100vw"
+          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
           className="object-cover opacity-25"
         />
         <div className="absolute inset-0 bg-obsidian/70" />
