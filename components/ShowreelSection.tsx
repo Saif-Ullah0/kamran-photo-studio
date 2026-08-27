@@ -38,7 +38,7 @@ export default function ShowreelSection() {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="none"
           onError={() => setVideoFailed(true)}
           className="absolute inset-0 h-full w-full object-cover"
         />
