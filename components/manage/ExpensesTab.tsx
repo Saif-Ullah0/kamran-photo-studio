@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
-import type { Booking, Expense } from "@/lib/manage/types";
+import type { Booking, CrewMember, Expense } from "@/lib/manage/types";
 import { EXPENSE_CATEGORIES } from "@/lib/manage/types";
 import { generateId } from "@/lib/manage/useLocalStorage";
 import { formatPKR, formatDate } from "@/lib/manage/utils";
@@ -11,15 +11,17 @@ interface ExpensesTabProps {
   expenses: Expense[];
   setExpenses: (expenses: Expense[]) => void;
   bookings: Booking[];
+  crew: CrewMember[];
 }
 
-export default function ExpensesTab({ expenses, setExpenses, bookings }: ExpensesTabProps) {
+export default function ExpensesTab({ expenses, setExpenses, bookings, crew }: ExpensesTabProps) {
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState({
     category: EXPENSE_CATEGORIES[0],
     amount: 0,
     date: new Date().toISOString().slice(0, 10),
     bookingId: "",
+    crewId: "",
     notes: "",
   });
 
@@ -38,12 +40,27 @@ export default function ExpensesTab({ expenses, setExpenses, bookings }: Expense
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }, [expenses]);
 
+  const byCrew = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const e of expenses) {
+      if (!e.crewId) continue;
+      map.set(e.crewId, (map.get(e.crewId) ?? 0) + e.amount);
+    }
+    return Array.from(map.entries())
+      .map(([crewId, amount]) => ({
+        name: crew.find((c) => c.id === crewId)?.name ?? "Unknown",
+        amount,
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [expenses, crew]);
+
   function openNew() {
     setDraft({
       category: EXPENSE_CATEGORIES[0],
       amount: 0,
       date: new Date().toISOString().slice(0, 10),
       bookingId: "",
+      crewId: "",
       notes: "",
     });
     setShowForm(true);
@@ -51,10 +68,10 @@ export default function ExpensesTab({ expenses, setExpenses, bookings }: Expense
 
   function save() {
     if (draft.amount <= 0) return;
-    const { bookingId, ...rest } = draft;
+    const { bookingId, crewId, ...rest } = draft;
     setExpenses([
       ...expenses,
-      { ...rest, bookingId: bookingId || undefined, id: generateId() },
+      { ...rest, bookingId: bookingId || undefined, crewId: crewId || undefined, id: generateId() },
     ]);
     setShowForm(false);
   }
@@ -67,6 +84,11 @@ export default function ExpensesTab({ expenses, setExpenses, bookings }: Expense
   function clientFor(bookingId?: string) {
     if (!bookingId) return "—";
     return bookings.find((b) => b.id === bookingId)?.clientName ?? "—";
+  }
+
+  function crewNameFor(crewId?: string) {
+    if (!crewId) return "—";
+    return crew.find((c) => c.id === crewId)?.name ?? "—";
   }
 
   return (
@@ -86,13 +108,26 @@ export default function ExpensesTab({ expenses, setExpenses, bookings }: Expense
       </div>
 
       {byCategory.length > 0 && (
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-3 flex flex-wrap gap-2">
           {byCategory.map(([cat, amount]) => (
             <span
               key={cat}
               className="rounded-full border border-line bg-charcoal px-3 py-1.5 text-xs text-slate"
             >
               {cat}: <span className="text-offwhite">{formatPKR(amount)}</span>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {byCrew.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          {byCrew.map(({ name, amount }) => (
+            <span
+              key={name}
+              className="rounded-full border border-gold/30 bg-gold/5 px-3 py-1.5 text-xs text-slate"
+            >
+              {name}: <span className="text-gold">{formatPKR(amount)}</span>
             </span>
           ))}
         </div>
@@ -110,6 +145,7 @@ export default function ExpensesTab({ expenses, setExpenses, bookings }: Expense
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Category</th>
                 <th className="px-4 py-3">Amount</th>
+                <th className="px-4 py-3">Crew</th>
                 <th className="px-4 py-3">Linked booking</th>
                 <th className="px-4 py-3"></th>
               </tr>
@@ -122,6 +158,7 @@ export default function ExpensesTab({ expenses, setExpenses, bookings }: Expense
                   </td>
                   <td className="px-4 py-3 text-offwhite">{expense.category}</td>
                   <td className="px-4 py-3 text-red-300">{formatPKR(expense.amount)}</td>
+                  <td className="px-4 py-3 text-slate">{crewNameFor(expense.crewId)}</td>
                   <td className="px-4 py-3 text-slate">{clientFor(expense.bookingId)}</td>
                   <td className="px-4 py-3">
                     <button
@@ -206,6 +243,26 @@ export default function ExpensesTab({ expenses, setExpenses, bookings }: Expense
                     </option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs uppercase tracking-widest text-slate">
+                  Crew member (optional)
+                </label>
+                <select
+                  value={draft.crewId}
+                  onChange={(e) => setDraft({ ...draft, crewId: e.target.value })}
+                  className="w-full rounded-lg border border-line bg-obsidian px-3 py-2.5 text-sm text-offwhite outline-none focus:border-gold"
+                >
+                  <option value="">None</option>
+                  {crew.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[11px] text-slate/70">
+                  Useful for Crew Payout expenses — records who was paid.
+                </p>
               </div>
               <div>
                 <label className="mb-1.5 block text-xs uppercase tracking-widest text-slate">
