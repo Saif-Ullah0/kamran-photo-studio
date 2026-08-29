@@ -36,6 +36,7 @@ export interface Expense {
   amount: number;
   date: string; // ISO date
   bookingId?: string; // optional — links an expense to a specific event
+  crewId?: string; // optional — links an expense to a specific crew member (e.g. a payout)
   notes?: string;
 }
 
