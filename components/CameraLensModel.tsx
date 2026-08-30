@@ -17,7 +17,6 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
   useFrame((state, delta) => {
     if (!group.current) return;
 
-    // Mouse-follow: normalized pointer drives a gentle look-at rotation.
     target.current.x = state.pointer.x * 0.35;
     target.current.y = state.pointer.y * 0.22;
 
@@ -32,7 +31,6 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
       1 - Math.pow(0.001, delta)
     );
 
-    // Constant slow ambient rotation, layered under the mouse-follow.
     group.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.15) * 0.03;
 
     if (irisRef.current) {
@@ -40,36 +38,19 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
     }
   });
 
-  // NOTE ON ORIENTATION:
-  // Three.js CylinderGeometry's axis runs along Y by default — so every
-  // cylinder below that's meant to act as a forward-facing barrel/disc
-  // (rear mount, main barrel, front housing, front glass) needs
-  // rotation={[Math.PI / 2, 0, 0]} to turn that axis to face Z (the
-  // viewer). Without it, those pieces lie flat like a plate instead of
-  // standing up as a tube — that was the "black disc lying down" bug.
-  // TorusGeometry's default axis is already Z, so the ring elements
-  // (grip rings, gold accent ring, bezel ring) need NO rotation to face
-  // the viewer correctly.
-  //
-  // NOTE ON CLICK HANDLING: this model has no onClick of its own anymore.
-  // The click-to-flash trigger lives on the circular HTML div in
-  // HeroLensBadge.tsx instead, so the whole badge is clickable — not just
-  // the pixels where a mesh happens to be. Adding a click handler back
-  // here would double-fire the flash when someone clicks directly on the
-  // model (once via the mesh raycast, once via the div underneath it).
   return (
     <group
       ref={group}
       scale={scale ?? (viewport.width < 6 ? 0.72 : 1)}
       position={[0, -0.05, 0.85]}
     >
-      {/* ── CAMERA BODY — tan leather, reads as a body rather than a bare lens ── */}
+      {/* ── CAMERA BODY ── */}
       <mesh position={[0, 0, -1.75]}>
         <boxGeometry args={[2.0, 1.25, 0.85]} />
         <meshStandardMaterial color="#7a4b2e" roughness={0.75} metalness={0.05} />
       </mesh>
 
-      {/* Darker leather grip panel, front-right */}
+      {/* Grip panel */}
       <mesh position={[0.72, -0.02, -1.325]}>
         <boxGeometry args={[0.42, 1.05, 0.03]} />
         <meshStandardMaterial color="#4a2c19" roughness={0.9} metalness={0} />
@@ -87,9 +68,7 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
         <meshStandardMaterial color="#cfd0d4" metalness={0.9} roughness={0.22} />
       </mesh>
 
-      {/* Shutter button — gold, doubles as a visual "press here" cue.
-          A cylinder standing UP (unrotated) is correct here — a real
-          shutter button faces up, not forward. */}
+      {/* Gold shutter button */}
       <mesh position={[0.82, 0.76, -1.55]}>
         <cylinderGeometry args={[0.07, 0.07, 0.09, 20]} />
         <meshStandardMaterial
@@ -101,13 +80,13 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
         />
       </mesh>
 
-      {/* Film-advance lever hint */}
+      {/* Film-advance lever */}
       <mesh position={[-0.86, 0.73, -1.5]} rotation={[0, 0.3, 0]}>
         <boxGeometry args={[0.3, 0.05, 0.16]} />
         <meshStandardMaterial color="#cfd0d4" metalness={0.9} roughness={0.22} />
       </mesh>
 
-      {/* Small red tally light — a spot of color, classic camera detail */}
+      {/* Tally light */}
       <mesh position={[-0.55, 0.63, -1.325]}>
         <sphereGeometry args={[0.035, 12, 12]} />
         <meshStandardMaterial
@@ -118,9 +97,7 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
         />
       </mesh>
 
-      {/* Strap lugs — small rings on the left/right sides. Rotated around
-          Y (not X) so the ring's hole faces sideways, like a real lug
-          you'd loop a strap through. */}
+      {/* Strap lugs */}
       {[-1.03, 1.03].map((x) => (
         <mesh key={x} position={[x, 0.1, -1.75]} rotation={[0, Math.PI / 2, 0]}>
           <torusGeometry args={[0.065, 0.02, 8, 16]} />
@@ -128,100 +105,97 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
         </mesh>
       ))}
 
-      {/* ── LENS ASSEMBLY — black metal, protrudes from the body front ── */}
+      {/* ── REALISTIC TAPERED LENS ASSEMBLY ── */}
 
-      {/* Rear mount plate */}
-      <mesh position={[0, 0, -1.05]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.78, 0.9, 0.22, 48]} />
-        <meshStandardMaterial color="#2c2c30" metalness={0.9} roughness={0.3} />
+      {/* Rear chrome mount ring */}
+      <mesh position={[0, 0, -1.25]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.54, 0.58, 0.12, 48]} />
+        <meshStandardMaterial color="#b5b6ba" metalness={0.95} roughness={0.15} />
       </mesh>
 
-      {/* Main barrel */}
-      <mesh position={[0, 0, -0.55]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.72, 0.78, 0.9, 64]} />
-        <meshStandardMaterial color="#333338" metalness={0.85} roughness={0.32} />
+      {/* Main barrel section (Deep satin anodized black) */}
+      <mesh position={[0, 0, -1.02]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.48, 0.53, 0.34, 64]} />
+        <meshStandardMaterial color="#18181b" metalness={0.85} roughness={0.25} />
       </mesh>
 
-      {/* Grip texture rings on the barrel — torus already faces forward
-          by default, so no rotation needed. */}
-      {[-0.85, -0.7, -0.55, -0.4, -0.25].map((z, i) => (
+      {/* Focus grip ridges */}
+      {[-1.12, -1.06, -1.00, -0.94].map((z, i) => (
         <mesh key={i} position={[0, 0, z]}>
-          <torusGeometry args={[0.735, 0.012, 8, 64]} />
-          <meshStandardMaterial color="#0a0a0b" metalness={0.6} roughness={0.6} />
+          <torusGeometry args={[0.50, 0.009, 8, 64]} />
+          <meshStandardMaterial color="#09090b" metalness={0.4} roughness={0.7} />
         </mesh>
       ))}
 
-      {/* Champagne gold accent ring */}
-      <mesh position={[0, 0, -0.08]}>
-        <torusGeometry args={[0.74, 0.028, 16, 64]} />
+      {/* Gold brass trim ring */}
+      <mesh position={[0, 0, -0.83]}>
+        <torusGeometry args={[0.47, 0.018, 16, 64]} />
         <meshStandardMaterial
           color="#d4af37"
           metalness={1}
-          roughness={0.25}
+          roughness={0.2}
           emissive="#d4af37"
-          emissiveIntensity={0.35}
+          emissiveIntensity={0.25}
         />
       </mesh>
 
-      {/* Front housing */}
-      <mesh position={[0, 0, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.68, 0.72, 0.45, 64]} />
-        <meshStandardMaterial color="#38383d" metalness={0.9} roughness={0.25} />
+      {/* Tapered front cone section — steps down smaller toward the glass */}
+      <mesh position={[0, 0, -0.66]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.38, 0.46, 0.32, 64]} />
+        <meshStandardMaterial color="#1a1a1e" metalness={0.9} roughness={0.22} />
       </mesh>
 
-      {/* Iris / aperture blades — rotating group for subtle life */}
-      <group ref={irisRef} position={[0, 0, 0.44]}>
+      {/* Iris / aperture blades within smaller front section */}
+      <group ref={irisRef} position={[0, 0, -0.53]}>
         {Array.from({ length: 9 }).map((_, i) => {
           const angle = (i / 9) * Math.PI * 2;
           return (
             <mesh
               key={i}
-              position={[Math.cos(angle) * 0.18, Math.sin(angle) * 0.18, 0]}
+              position={[Math.cos(angle) * 0.11, Math.sin(angle) * 0.11, 0]}
               rotation={[0, 0, angle]}
             >
-              <boxGeometry args={[0.34, 0.09, 0.02]} />
-              <meshStandardMaterial color="#050505" metalness={0.4} roughness={0.8} />
+              <boxGeometry args={[0.22, 0.06, 0.015]} />
+              <meshStandardMaterial color="#050505" metalness={0.5} roughness={0.7} />
             </mesh>
           );
         })}
       </group>
 
-      {/* Front glass element — this was the disc "lying down". Now
-          rotated so its flat face points at the viewer (+Z), not up (+Y). */}
-      <mesh position={[0, 0, 0.46]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.6, 0.6, 0.05, 64]} />
+      {/* Front glass lens element */}
+      <mesh position={[0, 0, -0.51]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.34, 0.34, 0.03, 64]} />
         <meshPhysicalMaterial
-          color="#0d1117"
+          color="#0f172a"
           metalness={0.1}
           roughness={0.05}
-          transmission={0.9}
-          thickness={0.4}
-          ior={1.5}
+          transmission={0.92}
+          thickness={0.25}
+          ior={1.52}
           clearcoat={1}
-          clearcoatRoughness={0.1}
-          reflectivity={0.9}
+          clearcoatRoughness={0.08}
+          reflectivity={0.95}
         />
       </mesh>
 
-      {/* Inner reflective glint — CircleGeometry already faces +Z by
-          default, so this one was always correctly oriented. */}
-      <mesh position={[0, 0, 0.48]}>
-        <circleGeometry args={[0.22, 48]} />
+      {/* Optical lens coating glint */}
+      <mesh position={[0, 0, -0.49]}>
+        <circleGeometry args={[0.13, 48]} />
         <meshStandardMaterial
-          color="#d4af37"
+          color="#fbbf24"
           emissive="#d4af37"
-          emissiveIntensity={0.5}
+          emissiveIntensity={0.45}
           metalness={1}
-          roughness={0.15}
+          roughness={0.1}
           transparent
-          opacity={0.35}
+          opacity={0.3}
         />
       </mesh>
 
-      {/* Front bezel ring */}
-      <mesh position={[0, 0, 0.44]}>
-        <torusGeometry args={[0.68, 0.035, 16, 64]} />
-        <meshStandardMaterial color="#0a0a0b" metalness={0.95} roughness={0.2} />
+      {/* Front bezel ring holding the glass */}
+      <mesh position={[0, 0, -0.50]}>
+        <torusGeometry args={[0.36, 0.022, 16, 64]} />
+        <meshStandardMaterial color="#09090b" metalness={0.95} roughness={0.15} />
       </mesh>
     </group>
   );
