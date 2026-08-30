@@ -8,13 +8,14 @@ import { waLink, SITE, HERO_IMAGES_LEFT, HERO_IMAGES_RIGHT } from "@/lib/data";
 import HeroImageColumn from "./HeroImageColumn";
 
 // R3F + use-sound both touch window/audio APIs, so the badge is loaded
-// client-only and never rendered during SSR.
+// client-only and never rendered during SSR. WebGL genuinely can't render
+// server-side, so there's an unavoidable gap before the chunk loads in
+// the browser — this placeholder fills that gap with the badge's own
+// shape instead of leaving empty space.
 const HeroLensBadge = dynamic(() => import("./HeroLensBadge"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[180px] w-[180px] animate-pulse items-center justify-center rounded-full border border-white/10 bg-white/5 sm:h-[224px] sm:w-[224px]">
-      <span className="text-xs text-neutral-500">Loading Lens...</span>
-    </div>
+    <div className="h-44 w-44 sm:h-56 sm:w-56 animate-pulse rounded-full border-2 border-gold/40 bg-charcoal/50" />
   ),
 });
 
@@ -34,7 +35,7 @@ export default function HeroSection() {
           alt=""
           fill
           priority
-          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
+          sizes="100vw"
           className="object-cover opacity-25"
         />
         <div className="absolute inset-0 bg-obsidian/70" />
@@ -73,7 +74,7 @@ export default function HeroSection() {
             className="flex flex-col items-center gap-2 py-1"
           >
             <HeroLensBadge />
-            <p className="text-[10px] uppercase tracking-widest text-slate/70">
+            <p className="text-[10px] uppercase tracking-widest text-slate/90">
               Click the lens
             </p>
           </motion.div>
