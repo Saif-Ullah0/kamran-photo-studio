@@ -23,24 +23,22 @@ export default function HeroLensBadge() {
 
   return (
     <>
-      <div className="relative h-44 w-44 sm:h-56 sm:w-56 overflow-hidden rounded-full border-2 border-gold/60 bg-charcoal/60 shadow-[0_0_70px_-8px_rgba(212,175,55,0.45)] backdrop-blur-sm">
+      <div
+        onClick={trigger}
+        className="relative h-44 w-44 sm:h-56 sm:w-56 cursor-pointer overflow-hidden rounded-full border-2 border-gold/60 bg-charcoal/60 shadow-[0_0_70px_-8px_rgba(212,175,55,0.45)] backdrop-blur-sm"
+      >
         <Suspense fallback={null}>
           <Canvas
             camera={{ position: [0, 0, 4.8], fov: 40 }}
-            dpr={[1, typeof window !== "undefined" && window.innerWidth < 768 ? 1 : 1.5]}
-            gl={{
-              antialias: false,
-              alpha: true,
-              powerPreference: "high-performance",
-              precision: "mediump",
-            }}
+            dpr={[1, 1.75]}
+            gl={{ antialias: true, alpha: true }}
           >
             <ambientLight intensity={0.65} />
             <directionalLight position={[3, 4, 5]} intensity={1.6} color="#f4f4f5" />
             <directionalLight position={[-3, -1, -4]} intensity={0.9} color="#d4af37" />
             <pointLight position={[-3, -2, 2]} intensity={1.8} color="#d4af37" />
             <pointLight position={[2, -3, -2]} intensity={0.8} color="#f4f4f5" />
-            <CameraLensModel onTrigger={trigger} scale={0.92} />
+            <CameraLensModel scale={0.92} />
           </Canvas>
         </Suspense>
       </div>
