@@ -41,7 +41,7 @@ export default function Hero3D() {
           <directionalLight position={[3, 4, 5]} intensity={0.9} color="#f4f4f5" />
           <pointLight position={[-2.5, -1.5, 2.5]} intensity={0.8} color="#d4af37" />
           <pointLight position={[1.8, -2.4, -1.8]} intensity={0.4} color="#8a8a93" />
-          <CameraLensModel onTrigger={trigger} />
+          <CameraLensModel />
         </Canvas>
       </Suspense>
 
