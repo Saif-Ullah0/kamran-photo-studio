@@ -260,7 +260,7 @@ export default function ExpensesTab({ expenses, setExpenses, bookings, crew }: E
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-[11px] text-slate/70">
+                <p className="mt-1 text-[11px] text-slate/90">
                   Useful for Crew Payout expenses — records who was paid.
                 </p>
               </div>
