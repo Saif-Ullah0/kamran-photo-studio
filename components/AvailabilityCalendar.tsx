@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useMemo, useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
@@ -62,7 +62,12 @@ interface MonthGridProps {
   onToggle: (iso: string) => void;
 }
 
-function MonthGrid({ year, month, selectedDates, onToggle }: MonthGridProps) {
+const MonthGrid = memo(function MonthGrid({
+  year,
+  month,
+  selectedDates,
+  onToggle,
+}: MonthGridProps) {
   const firstWeekday = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const today = useMemo(() => {
@@ -142,17 +147,17 @@ function MonthGrid({ year, month, selectedDates, onToggle }: MonthGridProps) {
       </div>
     </div>
   );
-}
+});
 
 export default function AvailabilityCalendar() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   const [monthOffset, setMonthOffset] = useState(0);
-  const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
+  const [selectedDates, setSelectedDates] = useState<Set<string>>(() => new Set());
   const [eventType, setEventType] = useState(EVENT_TYPES[0]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(TIME_SLOTS[3].id);
-  const [services, setServices] = useState<Set<string>>(new Set(["photography"]));
+  const [services, setServices] = useState<Set<string>>(() => new Set(["photography"]));
   const [details, setDetails] = useState("");
 
   const { year, month, nextYear, nextMonth } = useMemo(() => {
@@ -169,23 +174,31 @@ export default function AvailabilityCalendar() {
     };
   }, [monthOffset]);
 
-  function toggleDate(iso: string) {
+  const toggleDate = useCallback((iso: string) => {
     setSelectedDates((prev) => {
       const next = new Set(prev);
       if (next.has(iso)) next.delete(iso);
       else next.add(iso);
       return next;
     });
-  }
+  }, []);
 
-  function toggleService(id: string) {
+  const toggleService = useCallback((id: string) => {
     setServices((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  }
+  }, []);
+
+  const goToPreviousMonth = useCallback(() => {
+    setMonthOffset((value) => Math.max(0, value - 1));
+  }, []);
+
+  const goToNextMonth = useCallback(() => {
+    setMonthOffset((value) => value + 1);
+  }, []);
 
   const sortedDates = useMemo(() => Array.from(selectedDates).sort(), [selectedDates]);
   const canSubmit = sortedDates.length > 0;
@@ -255,7 +268,7 @@ export default function AvailabilityCalendar() {
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6">
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={() => setMonthOffset((v) => Math.max(0, v - 1))}
+              onClick={goToPreviousMonth}
               disabled={monthOffset === 0}
               aria-label="Previous month"
               className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 px-3.5 py-2 text-xs font-medium text-slate-300 transition-colors hover:border-amber-400/50 hover:text-amber-300 disabled:opacity-30 disabled:hover:border-white/10 disabled:hover:text-slate-300"
@@ -277,7 +290,7 @@ export default function AvailabilityCalendar() {
 
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={() => setMonthOffset((v) => v + 1)}
+              onClick={goToNextMonth}
               aria-label="Next month"
               className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 px-3.5 py-2 text-xs font-medium text-slate-300 transition-colors hover:border-amber-400/50 hover:text-amber-300"
             >

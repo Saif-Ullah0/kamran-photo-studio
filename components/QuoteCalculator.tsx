@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { Check, Minus, Plus, MessageCircle, HelpCircle, ArrowRight, Camera, Video, Film, Aperture } from "lucide-react";
 import { RESOURCE_RATES, ADD_ONS, waLink } from "@/lib/data";
@@ -12,14 +12,14 @@ function formatPKR(amount: number) {
 }
 
 // Map icons to crew types for studio context
-const CREW_ICONS: Record<string, React.ReactNode> = {
+const CREW_ICONS = {
   photographer: <Camera className="h-4 w-4 text-amber-400" />,
   videographer: <Video className="h-4 w-4 text-amber-400" />,
   drone: <Film className="h-4 w-4 text-amber-400" />,
-};
+} as const;
 
 // --- Animated Price Number ---
-function AnimatedNumber({ value }: { value: number }) {
+const AnimatedNumber = memo(function AnimatedNumber({ value }: { value: number }) {
   return (
     <motion.span
       key={value}
@@ -32,7 +32,7 @@ function AnimatedNumber({ value }: { value: number }) {
       {formatPKR(value)}
     </motion.span>
   );
-}
+});
 
 // --- Stepper Sub-Component ---
 interface StepperProps {
@@ -46,7 +46,7 @@ interface StepperProps {
   unitPrice?: number;
 }
 
-function Stepper({
+const Stepper = memo(function Stepper({
   id,
   label,
   description,
@@ -56,6 +56,14 @@ function Stepper({
   max = 10,
   unitPrice,
 }: StepperProps) {
+  const handleDecrease = useCallback(() => {
+    onChange(Math.max(min, value - 1));
+  }, [min, onChange, value]);
+
+  const handleIncrease = useCallback(() => {
+    onChange(Math.min(max, value + 1));
+  }, [max, onChange, value]);
+
   return (
     <div className="group relative flex flex-col justify-between gap-3 rounded-2xl border border-white/10 bg-black/40 p-4 transition-all duration-300 hover:border-amber-400/40 hover:bg-white/[0.03] hover:shadow-[0_0_20px_rgba(251,191,36,0.05)] sm:flex-row sm:items-center">
       <div className="flex items-start gap-3">
@@ -81,7 +89,7 @@ function Stepper({
         <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/60 p-1">
           <motion.button
             whileTap={{ scale: 0.9 }}
-            onClick={() => onChange(Math.max(min, value - 1))}
+            onClick={handleDecrease}
             disabled={value <= min}
             aria-label={`Decrease ${label}`}
             className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/5 text-slate-300 transition-colors hover:bg-amber-400/20 hover:text-amber-300 disabled:pointer-events-none disabled:opacity-25"
@@ -95,7 +103,7 @@ function Stepper({
 
           <motion.button
             whileTap={{ scale: 0.9 }}
-            onClick={() => onChange(Math.min(max, value + 1))}
+            onClick={handleIncrease}
             disabled={value >= max}
             aria-label={`Increase ${label}`}
             className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/5 text-slate-300 transition-colors hover:bg-amber-400/20 hover:text-amber-300 disabled:pointer-events-none disabled:opacity-25"
@@ -106,7 +114,7 @@ function Stepper({
       </div>
     </div>
   );
-}
+});
 
 // --- Main Calculator Component ---
 export default function QuoteCalculator() {
@@ -121,40 +129,49 @@ export default function QuoteCalculator() {
   });
   const [selectedAddOns, setSelectedAddOns] = useState<Set<string>>(new Set());
 
-  function setCount(id: string, value: number) {
+  const setCount = useCallback((id: string, value: number) => {
     setCounts((prev) => ({ ...prev, [id]: value }));
-  }
+  }, []);
 
-  function toggleAddOn(id: string) {
+  const toggleAddOn = useCallback((id: string) => {
     setSelectedAddOns((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  }
+  }, []);
 
-  // --- Calculations ---
-  const crewTotalPerDay = useMemo(() => {
-    return RESOURCE_RATES.reduce((sum, r) => sum + (counts[r.id] ?? 0) * r.pricePerDay, 0);
-  }, [counts]);
+  const activeCrew = useMemo(
+    () => RESOURCE_RATES.filter((r) => (counts[r.id] ?? 0) > 0),
+    [counts]
+  );
+
+  const selectedAddOnList = useMemo(
+    () => ADD_ONS.filter((a) => selectedAddOns.has(a.id)),
+    [selectedAddOns]
+  );
+
+  const crewTotalPerDay = useMemo(
+    () => RESOURCE_RATES.reduce((sum, r) => sum + (counts[r.id] ?? 0) * r.pricePerDay, 0),
+    [counts]
+  );
 
   const totalCrewCost = days * crewTotalPerDay;
-
-  const totalAddOnCost = useMemo(() => {
-    return ADD_ONS.filter((a) => selectedAddOns.has(a.id)).reduce((sum, a) => sum + a.price, 0);
-  }, [selectedAddOns]);
+  const totalAddOnCost = useMemo(
+    () => selectedAddOnList.reduce((sum, a) => sum + a.price, 0),
+    [selectedAddOnList]
+  );
 
   const total = totalCrewCost + totalAddOnCost;
-  const hasCrew = useMemo(() => RESOURCE_RATES.some((r) => (counts[r.id] ?? 0) > 0), [counts]);
+  const hasCrew = activeCrew.length > 0;
 
-  // --- Dynamic WhatsApp Payload ---
   const message = useMemo(() => {
-    const crewLines = RESOURCE_RATES.filter((r) => (counts[r.id] ?? 0) > 0)
+    const crewLines = activeCrew
       .map((r) => `• ${counts[r.id]}x ${r.label} (${formatPKR(r.pricePerDay)}/day)`)
       .join("\n");
 
-    const addOnLines = ADD_ONS.filter((a) => selectedAddOns.has(a.id))
+    const addOnLines = selectedAddOnList
       .map((a) => `• ${a.label} (${formatPKR(a.price)})`)
       .join("\n");
 
@@ -168,7 +185,7 @@ export default function QuoteCalculator() {
     ]
       .filter(Boolean)
       .join("\n\n");
-  }, [days, counts, selectedAddOns, total]);
+  }, [activeCrew, counts, days, selectedAddOnList, total]);
 
   return (
     <section ref={containerRef} className="relative overflow-hidden bg-[#070709] py-24 sm:py-32">
@@ -298,17 +315,17 @@ export default function QuoteCalculator() {
                 className="overflow-hidden border-t border-white/10 pt-6"
               >
                 <div className="space-y-2 font-mono text-xs text-slate-400">
-                  {RESOURCE_RATES.filter((r) => (counts[r.id] ?? 0) > 0).map((r) => (
+                  {activeCrew.map((r) => (
                     <div key={r.id} className="flex items-center justify-between">
                       <span>
                         {counts[r.id]}x {r.label} ({days} day{days > 1 ? "s" : ""})
                       </span>
                       <span className="text-slate-200">
-                        {formatPKR(counts[r.id] * r.pricePerDay * days)}
+                        {formatPKR((counts[r.id] ?? 0) * r.pricePerDay * days)}
                       </span>
                     </div>
                   ))}
-                  {ADD_ONS.filter((a) => selectedAddOns.has(a.id)).map((a) => (
+                  {selectedAddOnList.map((a) => (
                     <div key={a.id} className="flex items-center justify-between text-amber-300/90">
                       <span>Upgrade: {a.label}</span>
                       <span>{formatPKR(a.price)}</span>

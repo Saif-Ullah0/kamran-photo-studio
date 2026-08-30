@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { Camera as CameraIcon, RotateCcw } from "lucide-react";
@@ -8,9 +8,8 @@ import AmbientGlow from "./AmbientGlow";
 import { GEAR, MEDIA } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-// Tune these to taste:
-const PLAYBACK_RATE = 0.6; // 1 = normal speed, lower = slower. 0.4 stretches a 6s clip to ~15s.
-const START_DELAY_MS = 1500; // pause after the section enters view, before playback starts
+const PLAYBACK_RATE = 0.6;
+const START_DELAY_MS = 1200;
 
 export default function CameraShowcase() {
   const sectionRef = useRef(null);
@@ -21,26 +20,35 @@ export default function CameraShowcase() {
 
   useEffect(() => {
     if (!inView || hasStarted) return;
-    const timer = setTimeout(() => {
+
+    const timer = window.setTimeout(() => {
       const video = videoRef.current;
       if (!video) return;
+
+      video.muted = true;
       video.playbackRate = PLAYBACK_RATE;
-      video.play().catch(() => {
-        // Autoplay can be blocked before any user interaction on some
-        // browsers — clicking the video (see replay handler) still works.
-      });
-      setHasStarted(true);
+      video
+        .play()
+        .catch(() => {
+          // Autoplay can be blocked until user interaction; replay still works.
+        })
+        .finally(() => {
+          setHasStarted(true);
+        });
     }, START_DELAY_MS);
-    return () => clearTimeout(timer);
+
+    return () => window.clearTimeout(timer);
   }, [inView, hasStarted]);
 
-  function handleReplay() {
+  const handleReplay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    video.playbackRate = PLAYBACK_RATE;
+
+    video.pause();
     video.currentTime = 0;
-    video.play();
-  }
+    video.playbackRate = PLAYBACK_RATE;
+    video.play().catch(() => undefined);
+  }, []);
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-obsidian py-24 sm:py-32">
@@ -75,6 +83,7 @@ export default function CameraShowcase() {
             loop
             playsInline
             preload="metadata"
+            poster=""
             onClick={handleReplay}
             className="h-full w-full cursor-pointer object-contain"
           />
@@ -105,6 +114,9 @@ export default function CameraShowcase() {
                     alt={item.name}
                     fill
                     sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 16vw"
+                    priority={i < 2}
+                    loading={i < 2 ? "eager" : "lazy"}
+                    quality={68}
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/40 to-obsidian/10" />
