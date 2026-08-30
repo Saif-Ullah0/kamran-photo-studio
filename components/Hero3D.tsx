@@ -34,13 +34,13 @@ export default function Hero3D() {
       <Suspense fallback={<SceneLoader />}>
         <Canvas
           camera={{ position: [0, 0, 4.4], fov: 42 }}
-          dpr={[1, 1.75]}
-          gl={{ antialias: true, alpha: true }}
+          dpr={[1, 1.5]}
+          gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
         >
-          <ambientLight intensity={0.35} />
-          <directionalLight position={[3, 4, 5]} intensity={1.1} color="#f4f4f5" />
-          <pointLight position={[-3, -2, 2]} intensity={1.4} color="#d4af37" />
-          <pointLight position={[2, -3, -2]} intensity={0.6} color="#8a8a93" />
+          <ambientLight intensity={0.28} />
+          <directionalLight position={[3, 4, 5]} intensity={0.9} color="#f4f4f5" />
+          <pointLight position={[-2.5, -1.5, 2.5]} intensity={0.8} color="#d4af37" />
+          <pointLight position={[1.8, -2.4, -1.8]} intensity={0.4} color="#8a8a93" />
           <CameraLensModel onTrigger={trigger} />
         </Canvas>
       </Suspense>
