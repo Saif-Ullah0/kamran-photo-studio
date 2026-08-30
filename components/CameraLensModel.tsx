@@ -45,20 +45,21 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
       position={[0, -0.05, 0.85]}
     >
       {/* ── CAMERA BODY ── */}
-      <mesh position={[0, 0, -1.75]}>
-        <boxGeometry args={[2.0, 1.25, 0.85]} />
+      {/* Slightly lowered top edge & pushed back slightly to prevent Z-fighting */}
+      <mesh position={[0, -0.08, -1.755]}>
+        <boxGeometry args={[2.0, 1.10, 0.84]} />
         <meshStandardMaterial color="#7a4b2e" roughness={0.75} metalness={0.05} />
       </mesh>
 
       {/* Grip panel */}
-      <mesh position={[0.72, -0.02, -1.325]}>
+      <mesh position={[0.72, -0.02, -1.32]}>
         <boxGeometry args={[0.42, 1.05, 0.03]} />
         <meshStandardMaterial color="#4a2c19" roughness={0.9} metalness={0} />
       </mesh>
 
-      {/* Chrome top plate */}
-      <mesh position={[0, 0.62, -1.75]}>
-        <boxGeometry args={[2.04, 0.2, 0.85]} />
+      {/* Chrome top plate — shifted slightly forward (+Z) to completely eliminate Z-fighting */}
+      <mesh position={[0, 0.61, -1.745]}>
+        <boxGeometry args={[2.04, 0.22, 0.86]} />
         <meshStandardMaterial color="#cfd0d4" metalness={0.9} roughness={0.22} />
       </mesh>
 
@@ -87,7 +88,7 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
       </mesh>
 
       {/* Tally light */}
-      <mesh position={[-0.55, 0.63, -1.325]}>
+      <mesh position={[-0.55, 0.63, -1.32]}>
         <sphereGeometry args={[0.035, 12, 12]} />
         <meshStandardMaterial
           color="#c23b3b"
@@ -113,7 +114,7 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
         <meshStandardMaterial color="#b5b6ba" metalness={0.95} roughness={0.15} />
       </mesh>
 
-      {/* Main barrel section (Deep satin anodized black) */}
+      {/* Main barrel section */}
       <mesh position={[0, 0, -1.02]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.48, 0.53, 0.34, 64]} />
         <meshStandardMaterial color="#18181b" metalness={0.85} roughness={0.25} />
@@ -139,13 +140,13 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
         />
       </mesh>
 
-      {/* Tapered front cone section — steps down smaller toward the glass */}
+      {/* Tapered front cone section */}
       <mesh position={[0, 0, -0.66]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.38, 0.46, 0.32, 64]} />
         <meshStandardMaterial color="#1a1a1e" metalness={0.9} roughness={0.22} />
       </mesh>
 
-      {/* Iris / aperture blades within smaller front section */}
+      {/* Iris / aperture blades */}
       <group ref={irisRef} position={[0, 0, -0.53]}>
         {Array.from({ length: 9 }).map((_, i) => {
           const angle = (i / 9) * Math.PI * 2;
@@ -162,7 +163,7 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
         })}
       </group>
 
-      {/* Front glass lens element */}
+      {/* Front glass element */}
       <mesh position={[0, 0, -0.51]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.34, 0.34, 0.03, 64]} />
         <meshPhysicalMaterial
@@ -192,7 +193,7 @@ export default function CameraLensModel({ scale }: CameraLensModelProps) {
         />
       </mesh>
 
-      {/* Front bezel ring holding the glass */}
+      {/* Front bezel ring */}
       <mesh position={[0, 0, -0.50]}>
         <torusGeometry args={[0.36, 0.022, 16, 64]} />
         <meshStandardMaterial color="#09090b" metalness={0.95} roughness={0.15} />
