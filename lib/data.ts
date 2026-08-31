@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────
 // SITE CONFIG
 // ─────────────────────────────────────────────────────────────────────────
-const ADDRESS = "Gajju Matta, Susa Kahna Nau, Lahore, Punjab 53100, Pakistan";
+const ADDRESS = "Gajju Matta, Suwa Kahna Nau, Lahore, Punjab 53100, Pakistan";
 
 export const SITE = {
   name: "Kamran Photo Studio",
