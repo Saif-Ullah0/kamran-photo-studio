@@ -28,21 +28,22 @@ function bookingClient(bookings: Booking[], id?: string) {
 export function exportToExcel({ bookings, crew, payments, expenses }: AllData) {
   const wb = XLSX.utils.book_new();
 
-  const bookingsRows = bookings.map((b) => {
+  const bookingsRows = bookings.flatMap((b) => {
     const { paid, remaining } = bookingBalance(b, payments);
-    return {
+    return b.events.map((e) => ({
       Client: b.clientName,
       "Event Type": b.eventType,
-      Date: formatDate(b.date),
-      Venue: b.venue ?? "",
+      "Sub-Event": e.name,
+      Date: formatDate(e.date),
+      Venue: e.venue ?? "",
       Package: b.packageDescription,
       "Price (PKR)": b.price,
       "Paid (PKR)": paid,
       "Balance (PKR)": remaining,
-      Crew: b.crewIds.map((id) => crewName(crew, id)).join(", "),
+      Crew: e.crewIds.map((id) => crewName(crew, id)).join(", "),
       Status: b.status,
       Notes: b.notes ?? "",
-    };
+    }));
   });
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(bookingsRows), "Bookings");
 
