@@ -7,15 +7,28 @@ export interface CrewMember {
 
 export type BookingStatus = "upcoming" | "completed" | "cancelled";
 
+/**
+ * One dated occasion within a booking — e.g. a wedding's Mehndi, Barat,
+ * and Walima are three separate BookingEvents under one Booking, each
+ * with its own date, venue, and crew assignment (crew often differs, or
+ * needs checking against OTHER bookings, per individual date).
+ */
+export interface BookingEvent {
+  id: string;
+  name: string; // "Mehndi", "Barat", "Walima", "Mayo/Mangni", "Nikkah", or a custom label
+  date: string; // ISO date
+  venue?: string;
+  crewIds: string[];
+}
+
 export interface Booking {
   id: string;
   clientName: string;
+  clientPhone?: string; // needed to send WhatsApp confirmations
   eventType: string; // Wedding, Portrait, Commercial, Birthday/Event, Other
-  date: string; // ISO date, e.g. "2026-09-14"
-  venue?: string;
+  events: BookingEvent[]; // one or more — a portrait session has one, a wedding usually has 2-4
   packageDescription: string;
   price: number;
-  crewIds: string[];
   status: BookingStatus;
   notes?: string;
   createdAt: string; // ISO timestamp
@@ -47,6 +60,10 @@ export const EVENT_TYPES = [
   "Birthday / Private Event",
   "Other",
 ];
+
+// Suggested sub-event names when the event type is "Wedding" — still a
+// free-text field, these are just quick-pick presets.
+export const WEDDING_EVENT_PRESETS = ["Mehndi", "Barat", "Walima", "Mayo/Mangni", "Nikkah"];
 
 export const PAYMENT_METHODS = ["Cash", "Bank Transfer", "JazzCash", "Easypaisa", "Other"];
 
