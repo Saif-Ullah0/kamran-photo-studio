@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { CalendarDays, Wallet, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 import type { Booking, CrewMember, Payment, Expense } from "@/lib/manage/types";
-import { formatPKR, formatDate, bookingBalance, findCrewConflicts } from "@/lib/manage/utils";
+import { formatPKR, formatDate, bookingBalance, findAllConflictsForBooking, earliestEventDate, allCrewIds } from "@/lib/manage/utils";
 
 interface DashboardTabProps {
   bookings: Booking[];
@@ -50,7 +50,7 @@ export default function DashboardTab({ bookings, crew, payments, expenses }: Das
     () =>
       bookings
         .filter((b) => b.status === "upcoming")
-        .sort((a, b) => a.date.localeCompare(b.date)),
+        .sort((a, b) => earliestEventDate(a).localeCompare(earliestEventDate(b))),
     [bookings]
   );
 
@@ -66,9 +66,7 @@ export default function DashboardTab({ bookings, crew, payments, expenses }: Das
   // Any active booking whose crew currently clashes with another active booking.
   const conflictedBookings = useMemo(() => {
     return bookings.filter(
-      (b) =>
-        b.status !== "cancelled" &&
-        findCrewConflicts({ id: b.id, date: b.date, crewIds: b.crewIds }, bookings).length > 0
+      (b) => b.status !== "cancelled" && findAllConflictsForBooking(b, bookings).length > 0
     );
   }, [bookings]);
 
@@ -136,7 +134,7 @@ export default function DashboardTab({ bookings, crew, payments, expenses }: Das
                     {booking.clientName} — {booking.eventType}
                   </p>
                   <p className="text-xs text-slate">
-                    {formatDate(booking.date)} · {crewNames(booking.crewIds)}
+                    {formatDate(earliestEventDate(booking))} · {crewNames(allCrewIds(booking))}
                   </p>
                 </div>
                 <span className={"text-xs " + (remaining > 0 ? "text-gold" : "text-emerald-400")}>
