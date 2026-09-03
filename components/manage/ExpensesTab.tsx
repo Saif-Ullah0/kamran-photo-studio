@@ -5,7 +5,7 @@ import { Plus, Trash2, X } from "lucide-react";
 import type { Booking, CrewMember, Expense } from "@/lib/manage/types";
 import { EXPENSE_CATEGORIES } from "@/lib/manage/types";
 import { generateId } from "@/lib/manage/useLocalStorage";
-import { formatPKR, formatDate } from "@/lib/manage/utils";
+import { formatPKR, formatDate, earliestEventDate } from "@/lib/manage/utils";
 
 interface ExpensesTabProps {
   expenses: Expense[];
@@ -239,7 +239,7 @@ export default function ExpensesTab({ expenses, setExpenses, bookings, crew }: E
                   <option value="">None — general expense</option>
                   {bookings.map((b) => (
                     <option key={b.id} value={b.id}>
-                      {b.clientName} — {formatDate(b.date)}
+                      {b.clientName} — {formatDate(earliestEventDate(b))}
                     </option>
                   ))}
                 </select>
