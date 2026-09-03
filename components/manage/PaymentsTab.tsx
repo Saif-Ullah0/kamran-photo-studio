@@ -5,7 +5,7 @@ import { Plus, Trash2, X } from "lucide-react";
 import type { Booking, Payment } from "@/lib/manage/types";
 import { PAYMENT_METHODS } from "@/lib/manage/types";
 import { generateId } from "@/lib/manage/useLocalStorage";
-import { formatPKR, formatDate, bookingBalance } from "@/lib/manage/utils";
+import { formatPKR, formatDate, bookingBalance, earliestEventDate } from "@/lib/manage/utils";
 
 interface PaymentsTabProps {
   payments: Payment[];
@@ -158,7 +158,7 @@ export default function PaymentsTab({ payments, setPayments, bookings }: Payment
                 >
                   {bookings.map((b) => (
                     <option key={b.id} value={b.id}>
-                      {b.clientName} — {formatDate(b.date)}
+                      {b.clientName} — {formatDate(earliestEventDate(b))}
                     </option>
                   ))}
                 </select>
