@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -16,6 +16,7 @@ import {
 import { useLocalStorage } from "@/lib/manage/useLocalStorage";
 import type { Booking, CrewMember, Payment, Expense } from "@/lib/manage/types";
 import { exportToExcel, exportBackupJSON, importBackupJSON } from "@/lib/manage/backup";
+import { migrateBooking } from "@/lib/manage/utils";
 import DashboardTab from "@/components/manage/DashboardTab";
 import BookingsTab from "@/components/manage/BookingsTab";
 import CrewTab from "@/components/manage/CrewTab";
@@ -52,6 +53,26 @@ export default function ManagePage() {
     "kps-manage-expenses",
     []
   );
+
+  // Bookings saved before the multi-event update had a single
+  // `date`/`venue`/`crewIds` directly on the booking. This runs on every
+  // render (cheap — it's a no-op map for already-migrated data) so every
+  // child component always sees the current events[] shape, even on the
+  // very first render right after hydration.
+  const migratedBookings = useMemo(() => bookings.map(migrateBooking), [bookings]);
+
+  // Persist the migrated shape back to storage once, so future loads
+  // don't need re-migrating every time.
+  useEffect(() => {
+    if (!bookingsHydrated) return;
+    const needsMigration = bookings.some(
+      (b) => !Array.isArray((b as unknown as { events?: unknown }).events)
+    );
+    if (needsMigration) {
+      setBookings(migratedBookings);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingsHydrated]);
 
   const hydrated = bookingsHydrated && crewHydrated && paymentsHydrated && expensesHydrated;
 
@@ -94,7 +115,7 @@ export default function ManagePage() {
     );
   }
 
-  const allData = { bookings, crew, payments, expenses };
+  const allData = { bookings: migratedBookings, crew, payments, expenses };
 
   return (
     <div className="min-h-screen bg-obsidian text-offwhite">
@@ -173,11 +194,16 @@ export default function ManagePage() {
 
       <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
         {activeTab === "dashboard" && (
-          <DashboardTab bookings={bookings} crew={crew} payments={payments} expenses={expenses} />
+          <DashboardTab
+            bookings={migratedBookings}
+            crew={crew}
+            payments={payments}
+            expenses={expenses}
+          />
         )}
         {activeTab === "bookings" && (
           <BookingsTab
-            bookings={bookings}
+            bookings={migratedBookings}
             setBookings={setBookings}
             crew={crew}
             payments={payments}
@@ -185,13 +211,13 @@ export default function ManagePage() {
         )}
         {activeTab === "crew" && <CrewTab crew={crew} setCrew={setCrew} />}
         {activeTab === "payments" && (
-          <PaymentsTab payments={payments} setPayments={setPayments} bookings={bookings} />
+          <PaymentsTab payments={payments} setPayments={setPayments} bookings={migratedBookings} />
         )}
         {activeTab === "expenses" && (
           <ExpensesTab
             expenses={expenses}
             setExpenses={setExpenses}
-            bookings={bookings}
+            bookings={migratedBookings}
             crew={crew}
           />
         )}
