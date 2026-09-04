@@ -19,6 +19,7 @@ import { exportToExcel, exportBackupJSON, importBackupJSON } from "@/lib/manage/
 import { migrateBooking } from "@/lib/manage/utils";
 import DashboardTab from "@/components/manage/DashboardTab";
 import BookingsTab from "@/components/manage/BookingsTab";
+import CalendarTab from "@/components/manage/CalendarTab";
 import CrewTab from "@/components/manage/CrewTab";
 import PaymentsTab from "@/components/manage/PaymentsTab";
 import ExpensesTab from "@/components/manage/ExpensesTab";
@@ -27,6 +28,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "bookings", label: "Bookings", icon: CalendarDays },
+  { id: "calendar", label: "Calendar", icon: CalendarDays },
   { id: "crew", label: "Crew", icon: Users },
   { id: "payments", label: "Payments", icon: Wallet },
   { id: "expenses", label: "Expenses", icon: Receipt },
@@ -209,7 +211,17 @@ export default function ManagePage() {
             payments={payments}
           />
         )}
-        {activeTab === "crew" && <CrewTab crew={crew} setCrew={setCrew} />}
+        {activeTab === "calendar" && (
+          <CalendarTab bookings={migratedBookings} crew={crew} />
+        )}
+        {activeTab === "crew" && (
+          <CrewTab
+            crew={crew}
+            setCrew={setCrew}
+            expenses={expenses}
+            bookings={migratedBookings}
+          />
+        )}
         {activeTab === "payments" && (
           <PaymentsTab payments={payments} setPayments={setPayments} bookings={migratedBookings} />
         )}
