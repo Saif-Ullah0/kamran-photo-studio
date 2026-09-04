@@ -1,9 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, MapPin, User, Camera } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, MapPin, User } from "lucide-react";
 import type { Booking, CrewMember } from "@/lib/manage/types";
-import { formatDate, formatPKR } from "@/lib/manage/utils";
 
 interface CalendarTabProps {
   bookings: Booking[];
