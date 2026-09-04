@@ -1,7 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, X, AlertTriangle, Check, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  AlertTriangle,
+  Check,
+  MessageCircle,
+  FileText,
+} from "lucide-react";
 import type { Booking, BookingEvent, BookingStatus, CrewMember, Payment } from "@/lib/manage/types";
 import { EVENT_TYPES, BOOKING_STATUSES, WEDDING_EVENT_PRESETS } from "@/lib/manage/types";
 import { generateId } from "@/lib/manage/useLocalStorage";
@@ -192,7 +202,7 @@ export default function BookingsTab({ bookings, setBookings, crew, payments }: B
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex items-center justify-end gap-2">
                         {confirmLink && (
                           <a
                             href={confirmLink}
@@ -204,6 +214,17 @@ export default function BookingsTab({ bookings, setBookings, crew, payments }: B
                             <MessageCircle className="h-3.5 w-3.5" />
                           </a>
                         )}
+                        <Link
+                          href={`/manage/agreement/${booking.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Print booking agreement"
+                          title="Print booking agreement"
+                          className="inline-flex items-center gap-1 rounded-md border border-gold/40 bg-gold/10 px-2 py-1 text-xs font-medium text-gold transition-colors hover:bg-gold hover:text-obsidian"
+                        >
+                          <FileText className="h-3.5 w-3.5" />
+                          <span>PDF</span>
+                        </Link>
                         <button
                           onClick={() => openEdit(booking)}
                           aria-label="Edit"
