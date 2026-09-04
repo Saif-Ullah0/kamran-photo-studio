@@ -67,7 +67,7 @@ export default function AgreementPage() {
       {/* The document itself */}
       <div className="mx-auto max-w-2xl px-8 py-12 print:px-0 print:py-6">
         <div className="mb-8 flex items-center justify-between border-b-2 border-gray-900 pb-6">
-          <div className="relative h-20 w-56">
+          <div className="relative h-32 w-76">
             <Image src="/logo.jpeg" alt={SITE.name} fill className="object-contain object-left" />
           </div>
           <div className="text-right text-xs text-gray-500">
@@ -92,20 +92,20 @@ export default function AgreementPage() {
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
             Event Details — {booking.eventType}
           </h2>
-          <table className="w-full border-collapse text-sm">
-            <thead>
+          <table className="w-full border-collapse border border-gray-300 text-sm">
+            <thead className="bg-gray-50">
               <tr className="border-b border-gray-300 text-left text-xs uppercase text-gray-500">
-                <th className="py-2 pr-4">Event</th>
-                <th className="py-2 pr-4">Date</th>
-                <th className="py-2">Venue</th>
+                <th className="border-r border-gray-300 px-3 py-2.5">Event</th>
+                <th className="border-r border-gray-300 px-3 py-2.5">Date</th>
+                <th className="px-3 py-2.5">Venue</th>
               </tr>
             </thead>
             <tbody>
               {booking.events.map((e) => (
-                <tr key={e.id} className="border-b border-gray-100">
-                  <td className="py-2 pr-4">{e.name || booking.eventType}</td>
-                  <td className="py-2 pr-4">{formatDate(e.date)}</td>
-                  <td className="py-2">{e.venue || "—"}</td>
+                <tr key={e.id} className="border-b border-gray-200 last:border-b-0">
+                  <td className="border-r border-gray-200 px-3 py-2.5">{e.name || booking.eventType}</td>
+                  <td className="border-r border-gray-200 px-3 py-2.5">{formatDate(e.date)}</td>
+                  <td className="px-3 py-2.5">{e.venue || "—"}</td>
                 </tr>
               ))}
             </tbody>
@@ -117,19 +117,19 @@ export default function AgreementPage() {
             Package &amp; Payment
           </h2>
           <p className="mb-3 text-sm">{booking.packageDescription}</p>
-          <table className="w-full text-sm">
+          <table className="w-full border-collapse border border-gray-300 text-sm">
             <tbody>
-              <tr className="border-t border-gray-200">
-                <td className="py-1.5 text-gray-500">Total Price</td>
-                <td className="py-1.5 text-right font-medium">{formatPKR(booking.price)}</td>
+              <tr className="border-b border-gray-200">
+                <td className="border-r border-gray-200 px-3 py-2.5 text-gray-500">Total Price</td>
+                <td className="px-3 py-2.5 text-right font-medium">{formatPKR(booking.price)}</td>
               </tr>
-              <tr>
-                <td className="py-1.5 text-gray-500">Amount Paid</td>
-                <td className="py-1.5 text-right">{formatPKR(paid)}</td>
+              <tr className="border-b border-gray-200">
+                <td className="border-r border-gray-200 px-3 py-2.5 text-gray-500">Amount Paid</td>
+                <td className="px-3 py-2.5 text-right">{formatPKR(paid)}</td>
               </tr>
-              <tr className="border-t border-gray-300">
-                <td className="py-1.5 font-medium">Balance Due</td>
-                <td className="py-1.5 text-right font-semibold">{formatPKR(remaining)}</td>
+              <tr className="bg-gray-50">
+                <td className="border-r border-gray-300 px-3 py-2.5 font-medium">Balance Due</td>
+                <td className="px-3 py-2.5 text-right font-semibold">{formatPKR(remaining)}</td>
               </tr>
             </tbody>
           </table>
