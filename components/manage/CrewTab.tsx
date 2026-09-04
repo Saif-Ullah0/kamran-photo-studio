@@ -1,20 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
-import type { CrewMember } from "@/lib/manage/types";
+import type { Booking, CrewMember, Expense } from "@/lib/manage/types";
 import { generateId } from "@/lib/manage/useLocalStorage";
+import { formatPKR } from "@/lib/manage/utils";
 
 interface CrewTabProps {
   crew: CrewMember[];
   setCrew: (crew: CrewMember[]) => void;
+  expenses: Expense[];
+  bookings: Booking[];
 }
 
 const ROLE_OPTIONS = ["Photographer", "Videographer", "Drone Operator", "Editor", "Assistant"];
 
-export default function CrewTab({ crew, setCrew }: CrewTabProps) {
+export default function CrewTab({ crew, setCrew, expenses, bookings }: CrewTabProps) {
   const [editing, setEditing] = useState<CrewMember | null>(null);
   const [showForm, setShowForm] = useState(false);
+
+  const paidTotals = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const expense of expenses) {
+      if (!expense.crewId) continue;
+      map.set(expense.crewId, (map.get(expense.crewId) ?? 0) + expense.amount);
+    }
+    return map;
+  }, [expenses]);
+
+  const upcomingCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const booking of bookings) {
+      if (booking.status !== "upcoming") continue;
+      for (const event of booking.events) {
+        for (const crewId of event.crewIds) {
+          map.set(crewId, (map.get(crewId) ?? 0) + 1);
+        }
+      }
+    }
+    return map;
+  }, [bookings]);
 
   function openNew() {
     setEditing({ id: "", name: "", role: ROLE_OPTIONS[0], phone: "" });
@@ -68,6 +93,8 @@ export default function CrewTab({ crew, setCrew }: CrewTabProps) {
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Role</th>
                 <th className="px-4 py-3">Phone</th>
+                <th className="px-4 py-3">Upcoming</th>
+                <th className="px-4 py-3">Total paid</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -77,6 +104,10 @@ export default function CrewTab({ crew, setCrew }: CrewTabProps) {
                   <td className="px-4 py-3 font-medium text-offwhite">{member.name}</td>
                   <td className="px-4 py-3 text-slate">{member.role}</td>
                   <td className="px-4 py-3 text-slate">{member.phone || "—"}</td>
+                  <td className="px-4 py-3 text-slate">{upcomingCounts.get(member.id) ?? 0}</td>
+                  <td className="px-4 py-3 text-gold">
+                    {formatPKR(paidTotals.get(member.id) ?? 0)}
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                       <button
