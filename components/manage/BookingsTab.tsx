@@ -301,22 +301,26 @@ export default function BookingsTab({ bookings, setBookings, crew, payments }: B
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="mb-1.5 block text-xs uppercase tracking-widest text-slate">
-                    Status
-                  </label>
-                  <select
-                    value={editing.status}
-                    onChange={(e) => setEditing({ ...editing, status: e.target.value as BookingStatus })}
-                    className="w-full rounded-lg border border-line bg-obsidian px-3 py-2.5 text-sm capitalize text-offwhite outline-none focus:border-gold"
-                  >
-                    {BOOKING_STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {editing.id && (
+                  <div>
+                    <label className="mb-1.5 block text-xs uppercase tracking-widest text-slate">
+                      Status
+                    </label>
+                    <select
+                      value={editing.status}
+                      onChange={(e) =>
+                        setEditing({ ...editing, status: e.target.value as BookingStatus })
+                      }
+                      className="w-full rounded-lg border border-line bg-obsidian px-3 py-2.5 text-sm capitalize text-offwhite outline-none focus:border-gold"
+                    >
+                      {BOOKING_STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div className="col-span-2">
                   <label className="mb-1.5 block text-xs uppercase tracking-widest text-slate">
                     Package / what&apos;s booked
@@ -409,7 +413,7 @@ export default function BookingsTab({ bookings, setBookings, crew, payments }: B
                           </div>
                         </div>
 
-                        {crew.length > 0 && (
+                        {editing.id && crew.length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-1.5">
                             {crew.map((member) => {
                               const active = event.crewIds.includes(member.id);
