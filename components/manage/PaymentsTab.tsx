@@ -15,6 +15,7 @@ interface PaymentsTabProps {
 
 export default function PaymentsTab({ payments, setPayments, bookings }: PaymentsTabProps) {
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState("");
   const [draft, setDraft] = useState({
     bookingId: "",
     amount: 0,
@@ -32,13 +33,18 @@ export default function PaymentsTab({ payments, setPayments, bookings }: Payment
     [payments]
   );
 
+  const payableBookings = bookings.filter(
+    (booking) => bookingBalance(booking, payments).remaining > 0
+  );
+
   function clientFor(bookingId: string) {
     return bookings.find((b) => b.id === bookingId)?.clientName ?? "Unknown booking";
   }
 
   function openNew() {
+    setError("");
     setDraft({
-      bookingId: bookings[0]?.id ?? "",
+      bookingId: payableBookings[0]?.id ?? "",
       amount: 0,
       date: new Date().toISOString().slice(0, 10),
       method: PAYMENT_METHODS[0],
@@ -47,9 +53,23 @@ export default function PaymentsTab({ payments, setPayments, bookings }: Payment
     setShowForm(true);
   }
 
+  const selectedBooking = bookings.find((booking) => booking.id === draft.bookingId);
+  const remainingForDraft = selectedBooking
+    ? Math.max(0, bookingBalance(selectedBooking, payments).remaining)
+    : 0;
+
   function save() {
     if (!draft.bookingId || draft.amount <= 0) return;
+    const booking = bookings.find((item) => item.id === draft.bookingId);
+    const remaining = booking
+      ? Math.max(0, bookingBalance(booking, payments).remaining)
+      : 0;
+    if (draft.amount > remaining) {
+      setError(`Payment cannot exceed the remaining balance of ${formatPKR(remaining)}.`);
+      return;
+    }
     setPayments([...payments, { ...draft, id: generateId() }]);
+    setError("");
     setShowForm(false);
   }
 
@@ -67,7 +87,7 @@ export default function PaymentsTab({ payments, setPayments, bookings }: Payment
         </div>
         <button
           onClick={openNew}
-          disabled={bookings.length === 0}
+          disabled={payableBookings.length === 0}
           className="inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-sm font-medium text-obsidian transition-transform hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
         >
           <Plus className="h-4 w-4" strokeWidth={2.5} />
@@ -78,6 +98,10 @@ export default function PaymentsTab({ payments, setPayments, bookings }: Payment
       {bookings.length === 0 ? (
         <p className="rounded-xl border border-line bg-charcoal p-8 text-center text-sm text-slate">
           Add a booking first, then you can log payments against it.
+        </p>
+      ) : payableBookings.length === 0 ? (
+        <p className="rounded-xl border border-line bg-charcoal p-8 text-center text-sm text-slate">
+          All bookings are fully paid.
         </p>
       ) : sorted.length === 0 ? (
         <p className="rounded-xl border border-line bg-charcoal p-8 text-center text-sm text-slate">
@@ -153,10 +177,13 @@ export default function PaymentsTab({ payments, setPayments, bookings }: Payment
                 </label>
                 <select
                   value={draft.bookingId}
-                  onChange={(e) => setDraft({ ...draft, bookingId: e.target.value })}
+                  onChange={(e) => {
+                    setDraft({ ...draft, bookingId: e.target.value });
+                    setError("");
+                  }}
                   className="w-full rounded-lg border border-line bg-obsidian px-3 py-2.5 text-sm text-offwhite outline-none focus:border-gold"
                 >
-                  {bookings.map((b) => (
+                  {payableBookings.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.clientName} — {formatDate(earliestEventDate(b))}
                     </option>
@@ -171,9 +198,17 @@ export default function PaymentsTab({ payments, setPayments, bookings }: Payment
                   <input
                     type="number"
                     value={draft.amount || ""}
-                    onChange={(e) => setDraft({ ...draft, amount: Number(e.target.value) })}
+                    min="0"
+                    max={remainingForDraft}
+                    onChange={(e) => {
+                      setDraft({ ...draft, amount: Number(e.target.value) });
+                      setError("");
+                    }}
                     className="w-full rounded-lg border border-line bg-obsidian px-3 py-2.5 text-sm text-offwhite outline-none focus:border-gold"
                   />
+                  <p className="mt-1 text-xs text-slate">
+                    Remaining: {formatPKR(remainingForDraft)}
+                  </p>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs uppercase tracking-widest text-slate">
@@ -205,9 +240,11 @@ export default function PaymentsTab({ payments, setPayments, bookings }: Payment
               </div>
             </div>
 
+            {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+
             <button
               onClick={save}
-              disabled={!draft.bookingId || draft.amount <= 0}
+              disabled={!draft.bookingId || draft.amount <= 0 || draft.amount > remainingForDraft}
               className="mt-6 w-full rounded-full bg-gold px-4 py-2.5 text-sm font-medium text-obsidian transition-transform hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100"
             >
               Save payment
