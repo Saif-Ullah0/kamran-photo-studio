@@ -34,17 +34,25 @@ export default function Navbar() {
       <nav className="mx-auto max-w-7xl px-5 sm:px-8 h-16 md:h-20 flex items-center justify-between">
         <Link
           href="/"
-          className="relative h-9 w-36 shrink-0 sm:h-10 sm:w-44"
+          className="group flex shrink-0 items-center gap-3"
           aria-label="Kamran Photo Studio — home"
         >
           <Image
-            src="/logo.jpeg"
-            alt="Kamran Photo Studio"
-            fill
-            sizes="180px"
-            className="object-contain object-left"
+            src="/logo-mark.svg"
+            alt=""
+            width={38}
+            height={38}
+            className="h-8 w-8 sm:h-9 sm:w-9"
             priority
           />
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-xl tracking-[0.16em] text-offwhite transition-colors group-hover:text-gold sm:text-2xl">
+              KAMRAN
+            </span>
+            <span className="mt-1 text-[0.55rem] font-medium uppercase tracking-[0.42em] text-gold">
+              Photo Studio
+            </span>
+          </span>
         </Link>
 
         <ul className="hidden md:flex items-center gap-10 text-sm text-slate">
@@ -75,6 +83,8 @@ export default function Navbar() {
             onClick={() => setOpen((v) => !v)}
             className="md:hidden text-offwhite p-2 -mr-2"
             aria-label="Toggle menu"
+            aria-expanded={open}
+            aria-controls="mobile-navigation"
           >
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -83,6 +93,7 @@ export default function Navbar() {
 
       {open && (
         <motion.div
+          id="mobile-navigation"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
