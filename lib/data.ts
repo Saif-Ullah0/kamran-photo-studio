@@ -30,7 +30,9 @@ export const NAV_LINKS = [
   { label: "Packages", href: "/#packages" },
   { label: "About", href: "/#about" },
   { label: "Team", href: "/#team" },
-  { label: "FAQ", href: "/faq" },
+  { label: "Custom Pricing", href: "/quote" },
+  { label: "Booking", href: "/availability" },
+  { label: "Questions", href: "/faq" },
   { label: "Contact", href: "/#contact" },
 ];
 
@@ -289,13 +291,13 @@ export const PORTFOLIO_FILTERS: ("All" | PortfolioCategory)[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
-// PRICING — two service categories, each with 1/2/3-day duration tiers.
+// PRICING — each tier adds one daily service: photo, video, then drone.
 // ─────────────────────────────────────────────────────────────────────────
 export interface PricingTier {
   id: string;
   duration: string;
   price: string;
-  priceValue: number; // numeric PKR amount, used by the quote calculator
+  priceValue: number; // numeric PKR daily rate
   cadence: string;
   description: string;
   features: string[];
@@ -309,14 +311,16 @@ export const PACKAGE_CATEGORIES: { id: PackageCategoryId; label: string }[] = [
   { id: "videography", label: "Videography" },
 ];
 
+const DAILY_RATE = 15000;
+
 export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
   photography: [
     {
       id: "photo-1day",
       duration: "1 Day",
-      price: "PKR 45,000",
-      priceValue: 45000,
-      cadence: "per session",
+      price: "PKR 15,000",
+      priceValue: DAILY_RATE,
+      cadence: "per day",
       description: "Editorial-grade stills for portraits, events, and brand work.",
       features: [
         "Up to 8 hours on location",
@@ -328,9 +332,9 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
     {
       id: "photo-2day",
       duration: "2 Days",
-      price: "PKR 80,000",
-      priceValue: 80000,
-      cadence: "per project",
+      price: "PKR 30,000",
+      priceValue: DAILY_RATE * 2,
+      cadence: "per day",
       description: "Extended coverage across two days for larger events.",
       features: [
         "Two full days on location",
@@ -343,9 +347,9 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
     {
       id: "photo-3day",
       duration: "3 Days",
-      price: "PKR 110,000",
-      priceValue: 110000,
-      cadence: "per project",
+      price: "PKR 45,000",
+      priceValue: DAILY_RATE * 3,
+      cadence: "per day",
       description: "Complete multi-day documentation, start to finish.",
       features: [
         "Three full days on location",
@@ -359,9 +363,9 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
     {
       id: "video-1day",
       duration: "1 Day",
-      price: "PKR 120,000",
-      priceValue: 120000,
-      cadence: "per project",
+      price: "PKR 15,000",
+      priceValue: DAILY_RATE,
+      cadence: "per day",
       description: "Full-day cinematography with a graded highlight film.",
       features: [
         "Full-day multi-camera 4K coverage",
@@ -373,9 +377,9 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
     {
       id: "video-2day",
       duration: "2 Days",
-      price: "PKR 190,000",
-      priceValue: 190000,
-      cadence: "per project",
+      price: "PKR 30,000",
+      priceValue: DAILY_RATE * 2,
+      cadence: "per day",
       description: "Two-day cinema coverage with licensed aerial drone footage.",
       features: [
         "Two full days multi-camera 4K",
@@ -388,9 +392,9 @@ export const PACKAGES: Record<PackageCategoryId, PricingTier[]> = {
     {
       id: "video-3day",
       duration: "3 Days",
-      price: "PKR 260,000",
-      priceValue: 260000,
-      cadence: "per project",
+      price: "PKR 45,000",
+      priceValue: DAILY_RATE * 3,
+      cadence: "per day",
       description: "The complete drone, cinema & studio master package.",
       features: [
         "Three full days multi-camera 4K",
@@ -415,8 +419,8 @@ export const STATS = [
 // the About section always shows something even before you've added a
 // local photo. Swap to your own file later: put it in public/team/ (e.g.
 // "about.jpg") and change this to "/team/about.jpg".
-export const ABOUT_IMAGE =
-  "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=72&w=900&auto=format&fit=crop";
+// Add the portrait team group photo at public/team/about-team.jpg.
+export const ABOUT_IMAGE = "/team/about-team.jpg";
 
 // ─────────────────────────────────────────────────────────────────────────
 // MEDIA
@@ -462,19 +466,19 @@ export const RESOURCE_RATES: ResourceRate[] = [
   {
     id: "photographer",
     label: "Photographer",
-    pricePerDay: 20000,
+    pricePerDay: DAILY_RATE,
     description: "Full-day stills coverage, one shooter",
   },
   {
     id: "videographer",
     label: "Videographer",
-    pricePerDay: 30000,
+    pricePerDay: DAILY_RATE,
     description: "Full-day 4K cinema coverage, one shooter",
   },
   {
     id: "drone",
     label: "Drone Operator",
-    pricePerDay: 15000,
+    pricePerDay: DAILY_RATE,
     description: "Licensed aerial coverage, one operator + drone",
   },
 ];
