@@ -14,16 +14,16 @@ export default function About() {
     <section id="about" ref={ref} className="relative overflow-hidden bg-obsidian py-20 sm:py-28 md:py-32">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-20 lg:px-8">
         
-        {/* Featured Portrait Frame */}
+        {/* Featured Team Photo Frame */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={inView ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="group relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-line bg-charcoal transition-colors duration-500 hover:border-gold/40"
+          className="group relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-line bg-charcoal transition-colors duration-500 hover:border-gold/40"
         >
           <Image
             src={ABOUT_IMAGE}
-            alt="Kamran with cinema gear on location"
+            alt="The Kamran Photo Studio team"
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
