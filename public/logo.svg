@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 190" role="img" aria-labelledby="title desc">
+  <title id="title">Kamran Photo Studio</title>
+  <desc id="desc">Elegant camera mark and Kamran Photo Studio wordmark</desc>
+  <g fill="none" stroke="#d4af37" stroke-width="8">
+    <rect x="18" y="48" width="94" height="74" rx="12" />
+    <path d="M38 48 48 32h34l10 16" />
+    <circle cx="65" cy="85" r="22" />
+    <circle cx="65" cy="85" r="8" fill="#d4af37" stroke="none" />
+  </g>
+  <text x="142" y="91" fill="#111111" font-family="Georgia, 'Times New Roman', serif" font-size="62" letter-spacing="8">KAMRAN</text>
+  <path d="M145 112h310" stroke="#d4af37" stroke-width="3" />
+  <text x="147" y="151" fill="#555555" font-family="Arial, sans-serif" font-size="20" letter-spacing="10">PHOTO STUDIO</text>
+</svg>
