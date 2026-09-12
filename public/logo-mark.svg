@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">Kamran Photo Studio camera mark</title>
+  <desc id="desc">Gold camera icon</desc>
+  <g fill="none" stroke="#d4af37" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="12" y="30" width="76" height="55" rx="10" stroke-width="6" />
+    <path d="M29 30 37 17h26l8 13" stroke-width="6" />
+    <circle cx="50" cy="58" r="18" stroke-width="6" />
+    <circle cx="50" cy="58" r="6" fill="#d4af37" stroke="none" />
+    <circle cx="76" cy="43" r="3" fill="#d4af37" stroke="none" />
+  </g>
+</svg>
