@@ -68,7 +68,7 @@ export default function AgreementPage() {
       <div className="mx-auto max-w-2xl px-8 py-12 print:px-0 print:py-6">
         <div className="mb-8 flex items-center justify-between border-b-2 border-gray-900 pb-6">
           <div className="relative h-32 w-76">
-            <Image src="/logo.jpeg" alt={SITE.name} fill className="object-contain object-left" />
+            <Image src="/logo.svg" alt={SITE.name} fill className="object-contain object-left" />
           </div>
           <div className="text-right text-xs text-gray-500">
             <p>{SITE.address}</p>
